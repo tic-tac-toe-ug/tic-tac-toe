@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 
 @Component({
@@ -8,8 +8,19 @@ import {HttpClient} from '@angular/common/http';
 })
 export class AppComponent {
   title = 'Demo';
-  data = {};
+  data: Data = new Data("test", "test")
+
   constructor(private http: HttpClient) {
-    http.get('resource').subscribe(data => this.data = data);
+    http.get('resource').subscribe((data: any) => this.data = new Data(data['id'], data['content']));
+  }
+}
+
+export class Data {
+  id: String
+  content: String
+
+  constructor(id: String, content: String) {
+    this.id = id;
+    this.content = content;
   }
 }
