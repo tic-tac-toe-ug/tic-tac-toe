@@ -18,7 +18,7 @@ package com.ug.grupa2.tictactoe.entities;
 public class GameEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.TABLE)
+  @GeneratedValue(strategy = GenerationType.AUTO)
   @Getter
   private Long id;
   @CreationTimestamp
@@ -26,6 +26,7 @@ public class GameEntity {
   @Getter @Setter private String user1;
   @Getter @Setter private String user2;
   @Getter @Setter private String firstToMove;
+  @Column(name="moves")
   @Getter @Setter private Integer[] moves;
 
   public GameEntity(String user1) {
