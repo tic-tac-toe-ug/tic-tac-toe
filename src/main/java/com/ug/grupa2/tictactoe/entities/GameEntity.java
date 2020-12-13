@@ -17,8 +17,9 @@ package com.ug.grupa2.tictactoe.entities;
 @AllArgsConstructor
 public class GameEntity {
 
+  //TODO: Check id strategy, "TABLE" causing some hibernate errors. I dont know why :( /Przemek
   @Id
-  @GeneratedValue(strategy = GenerationType.TABLE)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Getter
   private Long id;
   @CreationTimestamp
