@@ -23,11 +23,6 @@ public class GameController {
   @ResponseBody
   public List<Map<String, Object>> get(){
     List<GameEntity> gameEntities = this.repository.findAll();
-    if (gameEntities.isEmpty()) {
-      throw new ResponseStatusException(
-        HttpStatus.NOT_FOUND, "game list empty"
-      );
-    }
     List<Map<String, Object>> model = new ArrayList<>();
 
     for (GameEntity e : gameEntities) {
