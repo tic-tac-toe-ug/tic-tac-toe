@@ -1,0 +1,41 @@
+<div class="card">
+  <h4 class="card-header">Rejestracja</h4>
+  <div class="card-body">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="email">Adres e-mail</label>
+        <input type="text" formControlName="email" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.email.errors }" />
+        <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
+          <div *ngIf="f.firstName.errors.required">Adres email jest wymagany</div>
+          <div *ngIf="f.firstName.errors.email">Format adresu email jest niepoprawny</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="login">Login</label>
+        <input type="text" formControlName="login" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.login.errors }" />
+        <div *ngIf="submitted && f.login.errors" class="invalid-feedback">
+          <div *ngIf="f.login.errors.required">Login is required</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="password">Hasło</label>
+        <input type="text" formControlName="password" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.password.errors }" />
+        <div *ngIf="submitted && f.username.errors" class="invalid-feedback">
+          <div *ngIf="f.password.errors.required">Hasło jest wymagane</div>
+          <div *ngIf="f.password.errors.minlength">Hasło nie spełnia standardów</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="repeatPassword">Powtórz hasło</label>
+        <input type="password" formControlName="repeatPassword" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.password.errors }" />
+      </div>
+      <div class="form-group">
+        <button [disabled]="loading" class="btn btn-primary">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+          Register
+        </button>
+        <a routerLink="/" class="btn btn-link">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
