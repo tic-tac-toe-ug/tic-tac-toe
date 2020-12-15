@@ -6,7 +6,9 @@ import {HttpClientModule} from '@angular/common/http';
 import {RouterModule} from '@angular/router';
 import {PageNotFoundComponent} from './page-not-found.component';
 import {HomeComponent} from './home.component';
-import {NavigationRoutes, NavigationComponent} from './navigation.component'
+import {NavigationRoutes, NavigationComponent} from './navigation.component';
+import { TicTacToeComponent } from './tic-tac-toe/tic-tac-toe.component'
+import {SquareComponent} from "./tic-tac-toe/square.component";
 
 
 @NgModule({
@@ -14,7 +16,9 @@ import {NavigationRoutes, NavigationComponent} from './navigation.component'
     AppComponent,
     NavigationComponent,
     PageNotFoundComponent,
-    HomeComponent
+    HomeComponent,
+    TicTacToeComponent,
+    SquareComponent
   ],
   imports: [
     BrowserModule,
