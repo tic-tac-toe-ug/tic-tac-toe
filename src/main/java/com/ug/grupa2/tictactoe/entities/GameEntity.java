@@ -1,14 +1,14 @@
 package com.ug.grupa2.tictactoe.entities;
 
-  import lombok.AllArgsConstructor;
-  import lombok.Getter;
-  import lombok.NoArgsConstructor;
-  import lombok.Setter;
-  import org.hibernate.annotations.CreationTimestamp;
+import com.ug.grupa2.tictactoe.services.GameService;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
-  import javax.persistence.*;
-  import java.sql.Array;
-  import java.sql.Timestamp;
+import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "games")
@@ -28,6 +28,7 @@ public class GameEntity {
   @Getter @Setter private String firstToMove;
   @Column(name="moves")
   @Getter @Setter private Integer[] moves;
+  @Getter @Setter private GameService.GameStatus gameStatus;
 
   public GameEntity(String user1) {
     this.user1 = user1;
