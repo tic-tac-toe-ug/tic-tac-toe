@@ -1,6 +1,6 @@
 package com.ug.grupa2.tictactoe.entities;
 
-import com.ug.grupa2.tictactoe.services.GameService;
+import com.ug.grupa2.tictactoe.enums.GameStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,13 +22,24 @@ public class GameEntity {
   @Getter
   private Long id;
   @CreationTimestamp
-  @Getter private Timestamp created;
-  @Getter @Setter private String user1;
-  @Getter @Setter private String user2;
-  @Getter @Setter private String firstToMove;
-  @Column(name="moves")
-  @Getter @Setter private Integer[] moves;
-  @Getter @Setter private GameService.GameStatus gameStatus;
+  @Getter
+  private Timestamp created;
+  @Getter
+  @Setter
+  private String user1;
+  @Getter
+  @Setter
+  private String user2;
+  @Getter
+  @Setter
+  private String firstToMove;
+  @Column(name = "moves")
+  @Getter
+  @Setter
+  private Integer[] moves;
+  @Getter
+  @Setter
+  private GameStatus gameStatus;
 
   public GameEntity(String user1) {
     this.user1 = user1;

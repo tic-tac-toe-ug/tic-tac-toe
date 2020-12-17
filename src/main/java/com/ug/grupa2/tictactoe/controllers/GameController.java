@@ -1,6 +1,7 @@
 package com.ug.grupa2.tictactoe.controllers;
 
 import com.ug.grupa2.tictactoe.entities.GameEntity;
+import com.ug.grupa2.tictactoe.enums.MoveResult;
 import com.ug.grupa2.tictactoe.services.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,8 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 @Controller
 @RequestMapping("/games")
@@ -24,27 +23,23 @@ public class GameController {
 
   @GetMapping("/")
   @ResponseBody
-  public List<Map<String, Object>> get() {
+  public List<GameEntity> get() {
 
-    return this.gameService.getGamesAsModel();
+    return this.gameService.getGames();
   }
 
   @GetMapping("/{id}")
   @ResponseBody
-  public Map<String, Object> getGame(@PathVariable("id") Long id) {
-    return this.gameService.getGameByIdAsModel(id);
+  public GameEntity getGame(@PathVariable("id") Long id) {
+    return this.gameService.getGameById(id);
   }
 
 
   @PutMapping("/create")
   @ResponseBody
-  public Map<String, Object> createGame(@RequestParam(required = true) String user) {
+  public GameEntity createGame(@RequestParam(required = true) String user) {
     // create new game in database
-    GameEntity game = this.gameService.createGame(user);
-
-    // return debug data
-    Map<String, Object> model = this.gameService.gameToModel(game);
-    return model;
+    return this.gameService.createGame(user);
   }
 
   @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
@@ -59,13 +54,34 @@ public class GameController {
   @ResponseBody
   public ResponseEntity<String> joinGame(@PathVariable("id") Long id, @RequestParam(required = true) String userId) {
     GameEntity gameEntity = this.gameService.getGameById(id);
-    return new ResponseEntity<String>(this.gameService.joinGame(gameEntity, userId));
+    if (this.gameService.joinGame(gameEntity, userId)){
+      return new ResponseEntity<String>(HttpStatus.OK);
+    }
+    else{
+      return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+    }
   }
 
   @RequestMapping(value = "{id}/play", method = RequestMethod.POST)
   @ResponseBody
   public ResponseEntity<String> playGame(@PathVariable("id") Long id, @RequestParam(required = true) String userId, @RequestParam(required = true) Integer move) {
     GameEntity gameEntity = this.gameService.getGameById(id);
-    return this.gameService.playGame(gameEntity, userId, move);
+    MoveResult result = this.gameService.playGame(gameEntity, userId, move);
+    if (result == MoveResult.INVALID_MOVE){
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+    if (result == MoveResult.UNAUTHORIZED){
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+    if (result == MoveResult.USER1_WON){
+      return new ResponseEntity<>("User1 won.", HttpStatus.OK);
+    }
+    if (result == MoveResult.USER2_WON){
+      return new ResponseEntity<>("User2 won.", HttpStatus.OK);
+    }
+    if (result == MoveResult.TIE){
+      return new ResponseEntity<>("TIE", HttpStatus.OK);
+    }
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 }

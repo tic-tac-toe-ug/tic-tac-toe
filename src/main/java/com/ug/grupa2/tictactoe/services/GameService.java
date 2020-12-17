@@ -2,37 +2,21 @@ package com.ug.grupa2.tictactoe.services;
 
 import com.ug.grupa2.tictactoe.GameEntityRepository;
 import com.ug.grupa2.tictactoe.entities.GameEntity;
+import com.ug.grupa2.tictactoe.enums.GameStatus;
+import com.ug.grupa2.tictactoe.enums.MoveResult;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class GameService {
-  public enum GameStatus {
-    CREATED("Created"),
-    IN_PROGRESS("In progress"),
-    TIE("Tie"),
-    DONE1("Finished. User1 won"),
-    DONE2("Finished. User2 won");
-    private final String name;
-
-    GameStatus(String s) {
-      name = s;
-    }
-
-  }
 
   private final GameEntityRepository gameRepository;
-
-  @Autowired
-  public GameService(GameEntityRepository gameRepository) {
-
-    this.gameRepository = gameRepository;
-  }
 
   public GameEntity createGame(String user1) {
     GameEntity newGame = new GameEntity(user1);
@@ -53,11 +37,11 @@ public class GameService {
     this.gameRepository.delete(gameEntity);
   }
 
-  public ResponseEntity<String> playGame(GameEntity gameEntity, String userId, Integer move) {
-    HttpStatus status = isMoveValid(gameEntity, userId, move);
+  public MoveResult playGame(GameEntity gameEntity, String userId, Integer move) {
+    MoveResult result = isMoveValid(gameEntity, userId, move);
     // If the requested move is invalid, return bad request.
-    if (status != HttpStatus.OK) {
-      return new ResponseEntity<>(status);
+    if (result != MoveResult.VALID_MOVE) {
+      return result;
     }
     Integer[] moves = gameEntity.getMoves();
     // Mark the player's move
@@ -72,27 +56,21 @@ public class GameService {
     }
     gameEntity.setMoves(moves);
 
-    // Check if this move leads to end of the game
-    Optional<ResponseEntity> result = getGameResult(gameEntity);
+    MoveResult gameResult = getGameResult(gameEntity);
     this.saveGame(gameEntity);
-
-    if (result.isPresent()) {
-      return result.get();
-    } else {
-      return new ResponseEntity<>(HttpStatus.OK);
-    }
+    return gameResult;
   }
 
-  public HttpStatus joinGame(GameEntity gameEntity, String userId) {
+  public boolean joinGame(GameEntity gameEntity, String userId) {
 
     // If the game is full, return 400
     if (gameEntity.getUser2() != null) {
-      return HttpStatus.BAD_REQUEST;
+      return false;
     }
 
     // If game is in progress or done, return 400
     if (gameEntity.getGameStatus() != GameStatus.CREATED) {
-      return HttpStatus.BAD_REQUEST;
+      return false;
     }
 
     // Set this user as an opponent in the game
@@ -106,7 +84,7 @@ public class GameService {
       gameEntity.setFirstToMove(userId);
     gameEntity.setGameStatus(GameStatus.IN_PROGRESS);
     this.saveGame(gameEntity);
-    return HttpStatus.OK;
+    return true;
   }
 
   public GameEntity getGameById(Long id) {
@@ -123,37 +101,7 @@ public class GameService {
     this.gameRepository.save(game);
   }
 
-  public Map<String, Object> gameToModel(GameEntity game) {
-    Map<String, Object> temp = new HashMap<>();
-    temp.put("id", game.getId().toString());
-    temp.put("user1", game.getUser1());
-    temp.put("user2", game.getUser2());
-    temp.put("firstMove", game.getFirstToMove());
-    temp.put("moves", game.getMoves());
-    temp.put("time", game.getCreated().toString());
-    temp.put("status", game.getGameStatus().toString());
-    return temp;
-  }
-
-  public List<Map<String, Object>> getGamesAsModel() {
-    List<GameEntity> gameEntities = this.getGames();
-    List<Map<String, Object>> model = new ArrayList<>();
-
-    for (GameEntity e : gameEntities) {
-      Map<String, Object> temp = gameToModel(e);
-      model.add(temp);
-    }
-    return model;
-  }
-
-  public Map<String, Object> getGameByIdAsModel(Long id) {
-
-    GameEntity gameEntity = this.getGameById(id);
-    Map<String, Object> model = gameToModel(gameEntity);
-    return model;
-  }
-
-  private Optional<ResponseEntity> getGameResult(GameEntity gameEntity) {
+  private MoveResult getGameResult(GameEntity gameEntity) {
     // The easiest way is to check all possibilities, since it's 3x3 - we can afford it
     int[][] endConditions = {
       {1, 2, 3},
@@ -168,40 +116,40 @@ public class GameService {
     Integer[] moves = gameEntity.getMoves();
     for (int i = 0; i < 8; i++) {
       if (moves[endConditions[i][0] - 1] == 1 && moves[endConditions[i][1] - 1] == 1 && moves[endConditions[i][2] - 1] == 1) {
-        gameEntity.setGameStatus(GameStatus.DONE1);
-        return Optional.of(new ResponseEntity<String>("Player 1 won", HttpStatus.OK));
+        gameEntity.setGameStatus(GameStatus.USER1_WON);
+        return MoveResult.USER1_WON;
       } else if (moves[endConditions[i][0] - 1] == 2 && moves[endConditions[i][1] - 1] == 2 && moves[endConditions[i][2] - 1] == 2) {
-        gameEntity.setGameStatus(GameStatus.DONE2);
-        return Optional.of(new ResponseEntity<String>("Player 2 won", HttpStatus.OK));
+        gameEntity.setGameStatus(GameStatus.USER2_WON);
+        return MoveResult.USER2_WON;
       }
     }
 
     // look for tie
     if (!Arrays.asList(moves).contains(0)) {
       gameEntity.setGameStatus(GameStatus.TIE);
-      return Optional.of(new ResponseEntity<>("Tie", HttpStatus.OK));
+      return MoveResult.TIE;
     }
-    return Optional.empty();
+    return MoveResult.VALID_MOVE;
   }
 
-  private HttpStatus isMoveValid(GameEntity gameEntity, String userId, Integer move) {
+  private MoveResult isMoveValid(GameEntity gameEntity, String userId, Integer move) {
     if (!Objects.equals(gameEntity.getUser1(), userId) && !Objects.equals(gameEntity.getUser2(), userId)) {
-      return HttpStatus.UNAUTHORIZED;
+      return MoveResult.UNAUTHORIZED;
     }
 
     // As long as the game only has 1 person, it is impossible to play
     if (gameEntity.getUser1() == null || gameEntity.getUser2() == null) {
-      return HttpStatus.BAD_REQUEST;
+      return MoveResult.INVALID_MOVE;
     }
 
     // You can play only 'in progress' game
     if (gameEntity.getGameStatus() != GameStatus.IN_PROGRESS) {
-      return HttpStatus.BAD_REQUEST;
+      return MoveResult.INVALID_MOVE;
     }
 
     // If this is not userId's turn
     if (!gameEntity.getFirstToMove().equals(userId)) {
-      return HttpStatus.BAD_REQUEST;
+      return MoveResult.INVALID_MOVE;
     }
     // Each element in moves array represents specific player's move.
     // Fields in 3x3 tic tac toe grid are numbered as follows:
@@ -209,16 +157,15 @@ public class GameService {
     // | 4 | 5 | 6 |
     // | 7 | 8 | 9 |
     if (move < 1 || move > 9) {
-      return HttpStatus.BAD_REQUEST;
+      return MoveResult.INVALID_MOVE;
     }
 
     // Check if this move is possible
     Integer[] moves = gameEntity.getMoves();
     if (moves[move - 1] != 0) {
-      return HttpStatus.BAD_REQUEST;
+      return MoveResult.INVALID_MOVE;
     }
 
-
-    return HttpStatus.OK;
+    return MoveResult.VALID_MOVE;
   }
 }
