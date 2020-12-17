@@ -1,4 +1,4 @@
-package com.ug.grupa2.tictactoe;
+package com.ug.grupa2.tictactoe.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;

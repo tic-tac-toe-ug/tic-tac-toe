@@ -1,5 +1,6 @@
 package com.ug.grupa2.tictactoe;
 
+import com.ug.grupa2.tictactoe.entities.DataEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
