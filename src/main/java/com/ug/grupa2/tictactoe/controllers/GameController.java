@@ -37,7 +37,7 @@ public class GameController {
 
   @PutMapping("/create")
   @ResponseBody
-  public GameEntity createGame(@RequestParam(required = true) String user) {
+  public GameEntity createGame(@RequestParam String user) {
     // create new game in database
     return this.gameService.createGame(user);
   }
@@ -52,7 +52,7 @@ public class GameController {
   // TODO: update to support public/private games
   @RequestMapping(value = "{id}/join", method = RequestMethod.POST)
   @ResponseBody
-  public ResponseEntity<String> joinGame(@PathVariable("id") Long id, @RequestParam(required = true) String userId) {
+  public ResponseEntity<String> joinGame(@PathVariable("id") Long id, @RequestParam String userId) {
     GameEntity gameEntity = this.gameService.getGameById(id);
     if (this.gameService.joinGame(gameEntity, userId)){
       return new ResponseEntity<String>(HttpStatus.OK);
@@ -64,24 +64,9 @@ public class GameController {
 
   @RequestMapping(value = "{id}/play", method = RequestMethod.POST)
   @ResponseBody
-  public ResponseEntity<String> playGame(@PathVariable("id") Long id, @RequestParam(required = true) String userId, @RequestParam(required = true) Integer move) {
+  public ResponseEntity<String> playGame(@PathVariable("id") Long id, @RequestParam String userId, @RequestParam Integer move) {
     GameEntity gameEntity = this.gameService.getGameById(id);
     MoveResult result = this.gameService.playGame(gameEntity, userId, move);
-    if (result == MoveResult.INVALID_MOVE){
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
-    if (result == MoveResult.UNAUTHORIZED){
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-    }
-    if (result == MoveResult.USER1_WON){
-      return new ResponseEntity<>("User1 won.", HttpStatus.OK);
-    }
-    if (result == MoveResult.USER2_WON){
-      return new ResponseEntity<>("User2 won.", HttpStatus.OK);
-    }
-    if (result == MoveResult.TIE){
-      return new ResponseEntity<>("TIE", HttpStatus.OK);
-    }
-    return new ResponseEntity<>(HttpStatus.OK);
+    return result.toResponse();
   }
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -20,10 +21,6 @@ public class GameService {
 
   public GameEntity createGame(String user1) {
     GameEntity newGame = new GameEntity(user1);
-    Integer[] moves = new Integer[9];
-    Arrays.fill(moves, 0);
-    newGame.setMoves(moves);
-    newGame.setGameStatus(GameStatus.CREATED);
     this.saveGame(newGame);
     return newGame;
   }
@@ -43,7 +40,7 @@ public class GameService {
     if (result != MoveResult.VALID_MOVE) {
       return result;
     }
-    Integer[] moves = gameEntity.getMoves();
+    int[] moves = gameEntity.getMoves();
     // Mark the player's move
     // Player 1 -> 1
     // Player 2 -> 2
@@ -89,12 +86,9 @@ public class GameService {
 
   public GameEntity getGameById(Long id) {
     Optional<GameEntity> optGame = this.gameRepository.findById(id);
-    if (!optGame.isPresent()) {
-      throw new ResponseStatusException(
-        HttpStatus.NOT_FOUND, "game not found"
-      );
-    }
-    return optGame.get();
+    return optGame.orElseThrow(() ->new ResponseStatusException(
+      HttpStatus.NOT_FOUND, "game not found"
+    ));
   }
 
   public void saveGame(GameEntity game) {
@@ -113,7 +107,7 @@ public class GameService {
       {1, 5, 9},
       {3, 5, 7}
     };
-    Integer[] moves = gameEntity.getMoves();
+    int[] moves = gameEntity.getMoves();
     for (int i = 0; i < 8; i++) {
       if (moves[endConditions[i][0] - 1] == 1 && moves[endConditions[i][1] - 1] == 1 && moves[endConditions[i][2] - 1] == 1) {
         gameEntity.setGameStatus(GameStatus.USER1_WON);
@@ -125,7 +119,7 @@ public class GameService {
     }
 
     // look for tie
-    if (!Arrays.asList(moves).contains(0)) {
+    if (IntStream.of(moves).noneMatch(x -> x == 0)) {
       gameEntity.setGameStatus(GameStatus.TIE);
       return MoveResult.TIE;
     }
@@ -161,7 +155,7 @@ public class GameService {
     }
 
     // Check if this move is possible
-    Integer[] moves = gameEntity.getMoves();
+    int[] moves = gameEntity.getMoves();
     if (moves[move - 1] != 0) {
       return MoveResult.INVALID_MOVE;
     }

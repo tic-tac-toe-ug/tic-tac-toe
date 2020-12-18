@@ -26,6 +26,7 @@ public class GameEntity {
   private Timestamp created;
   @Getter
   @Setter
+  // TODO: add field validation
   private String user1;
   @Getter
   @Setter
@@ -36,12 +37,14 @@ public class GameEntity {
   @Column(name = "moves")
   @Getter
   @Setter
-  private Integer[] moves;
+  private int[] moves;
   @Getter
   @Setter
   private GameStatus gameStatus;
 
   public GameEntity(String user1) {
     this.user1 = user1;
+    this.moves = new int[9];
+    this.gameStatus = GameStatus.CREATED;
   }
 }
