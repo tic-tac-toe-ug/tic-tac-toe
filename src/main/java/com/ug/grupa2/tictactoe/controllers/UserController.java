@@ -1,12 +1,18 @@
 package com.ug.grupa2.tictactoe.controllers;
 
 import com.ug.grupa2.tictactoe.controllers.dto.RegistrationFrom;
+import com.ug.grupa2.tictactoe.controllers.dto.UserDetails;
 import com.ug.grupa2.tictactoe.entities.User;
 import com.ug.grupa2.tictactoe.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
@@ -25,9 +31,8 @@ public class UserController {
     return ResponseEntity.ok(user);
   }
 
-  //TODO: Add DTO class without password.
   @GetMapping("/{id}")
-  public ResponseEntity<User> getUser(@PathVariable Long id) {
-    return ResponseEntity.of(userService.getUser(id));
+  public ResponseEntity<UserDetails> getUser(@PathVariable Long id) {
+    return ResponseEntity.of(userService.getUserDetails(id));
   }
 }
