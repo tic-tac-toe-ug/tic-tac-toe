@@ -77,3 +77,7 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+#node
+/node
+/node_modules
