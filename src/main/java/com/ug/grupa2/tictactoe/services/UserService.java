@@ -4,9 +4,10 @@ import com.ug.grupa2.tictactoe.UserRepository;
 import com.ug.grupa2.tictactoe.controllers.dto.RegistrationFrom;
 import com.ug.grupa2.tictactoe.entities.User;
 import com.ug.grupa2.tictactoe.utils.exceptions.UserAlreadyExistsException;
-import com.ug.grupa2.tictactoe.utils.exceptions.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -32,8 +33,8 @@ public class UserService {
    * @param id
    * @return
    */
-  public User getUser(Long id) {
-    return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+  public Optional<User> getUser(Long id) {
+    return userRepository.findById(id);
   }
 
   private boolean isUserRegistered(RegistrationFrom registrationFrom) {
