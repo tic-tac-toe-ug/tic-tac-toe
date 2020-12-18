@@ -1,104 +1,72 @@
 package com.ug.grupa2.tictactoe.controllers;
 
-import com.ug.grupa2.tictactoe.GameEntityRepository;
 import com.ug.grupa2.tictactoe.entities.GameEntity;
+import com.ug.grupa2.tictactoe.enums.MoveResult;
+import com.ug.grupa2.tictactoe.services.GameService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
+import java.util.List;
 
 @Controller
 @RequestMapping("/games")
 public class GameController {
-  private final GameEntityRepository repository;
+  private final GameService gameService;
 
-  public GameController(GameEntityRepository repository) {
-    this.repository = repository;
+  @Autowired
+  public GameController(GameService gameService) {
+    this.gameService = gameService;
+  }
+
+  @GetMapping("/")
+  @ResponseBody
+  public List<GameEntity> get() {
+
+    return this.gameService.getGames();
   }
 
   @GetMapping("/{id}")
   @ResponseBody
-  public Map<String, Object> getGame(@PathVariable("id") Long id) {
-    Optional<GameEntity> optGameEntity = this.repository.findById(id);
-    if (!optGameEntity.isPresent()) {
-      throw new ResponseStatusException(
-        HttpStatus.NOT_FOUND, "game not found"
-      );
-    }
-    GameEntity gameEntity = optGameEntity.get();
-    Map<String, Object> model = new HashMap<>();
-    model.put("id", gameEntity.getId().toString());
-    model.put("user1", gameEntity.getUser1());
-    model.put("user2", gameEntity.getUser2());
-    model.put("firstMove", gameEntity.getFirstToMove());
-    model.put("time", gameEntity.getCreated().toString());
-    return model;
+  public GameEntity getGame(@PathVariable("id") Long id) {
+    return this.gameService.getGameById(id);
   }
 
-  //@PostMapping("/{id}}") doesn't work for me :(
-  @RequestMapping(value = "{id}", method = RequestMethod.POST)
-  @ResponseBody
-  public Map<String, Object> updateGame(@PathVariable("id") Long id, @RequestParam(required = false) String user2, @RequestParam(required = false) Integer move) {
-    // create new game in database
-    Optional<GameEntity> optGameEntity = this.repository.findById(id);
-    if (!optGameEntity.isPresent()) {
-      throw new ResponseStatusException(
-        HttpStatus.NOT_FOUND, "game not found"
-      );
-    }
-    GameEntity gameEntity = optGameEntity.get();
-    if (user2 != null && gameEntity.getUser2() == null) {
-      gameEntity.setUser2(user2);
-
-      Random generator = new Random();
-      if (generator.nextInt(2) == 0)
-        gameEntity.setFirstToMove(gameEntity.getUser1());
-      else
-        gameEntity.setFirstToMove(user2);
-    }
-    // todo: implement moves in some way. Now: array of 9 ints, let's assume first move is circle
-    this.repository.save(gameEntity);
-
-    Map<String, Object> model = new HashMap<>();
-    model.put("id", gameEntity.getId().toString());
-    model.put("user1", gameEntity.getUser1());
-    model.put("user2", gameEntity.getUser2());
-    model.put("firstMove", gameEntity.getFirstToMove());
-    model.put("time", gameEntity.getCreated().toString());
-    return model;
-  }
 
   @PutMapping("/create")
   @ResponseBody
-  public Map<String, Object> createGame() {
+  public GameEntity createGame(@RequestParam String user) {
     // create new game in database
-    GameEntity newGame = new GameEntity("u1");
-    this.repository.save(newGame);
-
-    // return debug data
-    Map<String, Object> model = new HashMap<>();
-    model.put("id", newGame.getId().toString());
-    model.put("user1", newGame.getUser1());
-    model.put("time", newGame.getCreated().toString());
-    return model;
+    return this.gameService.createGame(user);
   }
 
   @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
   @ResponseBody
-  public HttpStatus deleteGame(@PathVariable("id") Long id) {
-    Optional<GameEntity> optGameEntity = this.repository.findById(id);
-    if (!optGameEntity.isPresent()) {
-      throw new ResponseStatusException(
-        HttpStatus.NOT_FOUND, "game not found"
-      );
+  public ResponseEntity<String> deleteGame(@PathVariable("id") Long id) {
+    this.gameService.deleteGame(id);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  // TODO: update to support public/private games
+  @RequestMapping(value = "{id}/join", method = RequestMethod.POST)
+  @ResponseBody
+  public ResponseEntity<String> joinGame(@PathVariable("id") Long id, @RequestParam String userId) {
+    GameEntity gameEntity = this.gameService.getGameById(id);
+    if (this.gameService.joinGame(gameEntity, userId)){
+      return new ResponseEntity<String>(HttpStatus.OK);
     }
-    GameEntity gameEntity = optGameEntity.get();
-    this.repository.delete(gameEntity);
-    return HttpStatus.OK;
+    else{
+      return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @RequestMapping(value = "{id}/play", method = RequestMethod.POST)
+  @ResponseBody
+  public ResponseEntity<String> playGame(@PathVariable("id") Long id, @RequestParam String userId, @RequestParam Integer move) {
+    GameEntity gameEntity = this.gameService.getGameById(id);
+    MoveResult result = this.gameService.playGame(gameEntity, userId, move);
+    return result.toResponse();
   }
 }
