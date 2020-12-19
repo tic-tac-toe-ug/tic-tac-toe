@@ -11,6 +11,7 @@ import {TicTacToeComponent} from './tic-tac-toe/tic-tac-toe.component'
 import {SquareComponent} from "./tic-tac-toe/square.component";
 import {ReactiveFormsModule} from '@angular/forms';
 import {RegisterFormComponent} from './register-form/register-form.component';
+import { LoginComponent } from './login/login.component';
 
 
 @NgModule({
@@ -21,7 +22,8 @@ import {RegisterFormComponent} from './register-form/register-form.component';
     HomeComponent,
     TicTacToeComponent,
     SquareComponent,
-    RegisterFormComponent
+    RegisterFormComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
