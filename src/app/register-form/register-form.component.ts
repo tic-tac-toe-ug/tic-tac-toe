@@ -3,8 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-register-form',
-  templateUrl: './register-form.component.html',
-  styleUrls: ['./register-form.component.css']
+  templateUrl: './register-form.component.html'
 })
 export class RegisterFormComponent implements OnInit {
   // @ts-ignore
@@ -21,7 +20,7 @@ export class RegisterFormComponent implements OnInit {
   ngOnInit(): void {
     this.form = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
-      login: ['', Validators.required],
+      username: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(8)]],
       repeatPassword: ['', [Validators.required, Validators.minLength(8)]]
     });
@@ -35,7 +34,8 @@ export class RegisterFormComponent implements OnInit {
 
     // stop here if form is invalid
     if (this.form.invalid) {
-      console.log(this.form)
+      console.log(this.submitted)
+      console.log(this.f)
       return;
     }
 
