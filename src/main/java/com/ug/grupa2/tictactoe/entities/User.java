@@ -30,4 +30,8 @@ public class User {
   private String email;
 
   private String password;
+
+  private Long score;
+
+  private Long rank;
 }
