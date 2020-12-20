@@ -1,9 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {UserService} from "../user/user.service";
+import {UserForm} from "../user/userForm";
+import {User} from "../user/user";
+import {AlertService} from "../alert-component/alert.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-register-form',
-  templateUrl: './register-form.component.html'
+  templateUrl: './register-form.component.html',
+  providers: [UserService]
 })
 export class RegisterFormComponent implements OnInit {
   // @ts-ignore
@@ -12,7 +18,10 @@ export class RegisterFormComponent implements OnInit {
   submitted = false;
 
   constructor(
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private userService: UserService,
+    private alertService: AlertService,
+    private router: Router
   ) {
 
   }
@@ -20,13 +29,15 @@ export class RegisterFormComponent implements OnInit {
   ngOnInit(): void {
     this.form = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
-      username: ['', Validators.required],
+      login: ['', [Validators.required, Validators.min(3), Validators.max(15)]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       repeatPassword: ['', [Validators.required, Validators.minLength(8)]]
     });
   }
 
-  get f() { return this.form.controls; }
+  get f() {
+    return this.form.controls;
+  }
 
   onSubmit() {
     this.submitted = true;
@@ -36,8 +47,27 @@ export class RegisterFormComponent implements OnInit {
     if (this.form.invalid) {
       return;
     }
-
     this.loading = true;
+    this.userService.save(
+      new UserForm(
+        this.form.getRawValue().login,
+        this.form.getRawValue().password,
+        this.form.getRawValue().repeatPassword,
+        this.form.getRawValue().email
+      )
+    ).subscribe(
+      (user: User) => {
+        this.alertService.success("Rejestracja się powiodła!", {keepAfterRouteChange: true});
+        this.router.navigateByUrl("/login-form")
+      },
+      (errorResponse: any) => {
+        errorResponse.error.errors
+          .map((x: any) => x.defaultMessage)
+          .forEach((message: string) => this.alertService.error(message))
+        this.loading = false;
+      }
+    )
+
   }
 
 }
