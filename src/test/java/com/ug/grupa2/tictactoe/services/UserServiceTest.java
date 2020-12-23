@@ -1,6 +1,7 @@
 package com.ug.grupa2.tictactoe.services;
 
 import com.ug.grupa2.tictactoe.UserRepository;
+import com.ug.grupa2.tictactoe.controllers.dto.Rank;
 import com.ug.grupa2.tictactoe.controllers.dto.RegistrationFrom;
 import com.ug.grupa2.tictactoe.controllers.dto.UserDetails;
 import com.ug.grupa2.tictactoe.entities.User;
@@ -11,12 +12,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.anyString;
@@ -96,6 +95,31 @@ public class UserServiceTest {
 
     //THEN
     assertFalse(result.isPresent());
+  }
+
+  @Test
+  public void getUsersRankingShouldReturnEmptyListWhenEmptyRepository() {
+    //GIVEN
+    when(userRepository.findByOrderByScoreDesc()).thenReturn(Collections.emptyList());
+
+    //WHEN
+    Rank usersRanking = userService.getUsersRanking();
+
+    //THEN
+    assertEquals(0, usersRanking.getRanking().size());
+  }
+
+  @Test
+  public void getUsersRankingShouldReturnNonEMptyListWhenUserExists() {
+    //GIVEN
+    User user = getUser();
+    when(userRepository.findByOrderByScoreDesc()).thenReturn(Collections.singletonList(user));
+
+    //WHEN
+    Rank usersRanking = userService.getUsersRanking();
+
+    //THEN
+    assertEquals(1, usersRanking.getRanking().size());
   }
 
   private User getUser() {

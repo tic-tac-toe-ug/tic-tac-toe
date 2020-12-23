@@ -28,4 +28,11 @@ public class UserDetails {
       .rank(user.getRank())
       .build();
   }
+
+  public UserDetails updateRank(UserDetails user, Long newRankPosition){
+    return builder().login(user.getLogin())
+      .score(user.getScore())
+      .rank(newRankPosition)
+      .build();
+  }
 }
