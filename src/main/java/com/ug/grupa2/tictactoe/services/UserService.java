@@ -46,7 +46,6 @@ public class UserService {
     return userRepository.existsByLoginOrEmail(registrationFrom.getLogin(), registrationFrom.getEmail());
   }
 
-
   //TODO: Add password encoding.
   private User saveUser(RegistrationFrom registrationFrom) {
     long numberOfUsers = userRepository.count();
