@@ -1,6 +1,6 @@
 package com.ug.grupa2.tictactoe.controllers;
 
-import com.ug.grupa2.tictactoe.controllers.dto.Rank;
+import com.ug.grupa2.tictactoe.controllers.dto.Ranking;
 import com.ug.grupa2.tictactoe.controllers.dto.RegistrationFrom;
 import com.ug.grupa2.tictactoe.controllers.dto.UserDetails;
 import com.ug.grupa2.tictactoe.entities.User;
@@ -37,8 +37,8 @@ public class UserController {
     return ResponseEntity.of(userService.getUserDetails(id));
   }
 
-  @GetMapping("/rank")
-  public ResponseEntity<Rank> getUsersRank() {
+  @GetMapping("/ranking")
+  public ResponseEntity<Ranking> getUsersRanking() {
     return ResponseEntity.ok(userService.getUsersRanking());
   }
 }

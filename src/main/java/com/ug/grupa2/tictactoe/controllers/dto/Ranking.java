@@ -9,16 +9,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
-public class Rank {
+public class Ranking {
   private final List<UserDetails> ranking;
 
-  public static Rank from(List<User> users) {
+  public static Ranking from(List<User> users) {
     List<UserDetails> ranking = users.stream()
       .map(UserDetails::of)
       .collect(Collectors.toList());
 
     List<UserDetails> defensiveCopy = Collections.unmodifiableList(new ArrayList<>(ranking));
 
-    return new Rank(defensiveCopy);
+    return new Ranking(defensiveCopy);
   }
 }

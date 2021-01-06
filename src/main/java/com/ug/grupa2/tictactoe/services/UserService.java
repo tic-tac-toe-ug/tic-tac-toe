@@ -1,7 +1,7 @@
 package com.ug.grupa2.tictactoe.services;
 
 import com.ug.grupa2.tictactoe.UserRepository;
-import com.ug.grupa2.tictactoe.controllers.dto.Rank;
+import com.ug.grupa2.tictactoe.controllers.dto.Ranking;
 import com.ug.grupa2.tictactoe.controllers.dto.RegistrationFrom;
 import com.ug.grupa2.tictactoe.controllers.dto.UserDetails;
 import com.ug.grupa2.tictactoe.entities.User;
@@ -36,10 +36,10 @@ public class UserService {
 
 
   //TODO: Confirm paging or other sorting type.
-  public Rank getUsersRanking() {
+  public Ranking getUsersRanking() {
     List<User> usersByScore = getUsersByScore();
 
-    return Rank.from(usersByScore);
+    return Ranking.from(usersByScore);
   }
 
   private boolean isUserRegistered(RegistrationFrom registrationFrom) {
