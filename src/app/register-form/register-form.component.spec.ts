@@ -30,7 +30,7 @@ describe('RegisterFormComponent', () => {
 
   it('form invalid when empty', () => {
     expect(component.form.valid).toBeFalsy();
-    expect(component.f.username.errors).toEqual({"required": true})
+    expect(component.f.login.errors).toEqual({"required": true})
     expect(component.f.email.errors).toEqual({"required": true})
     expect(component.f.password.errors).toEqual({"required": true})
     expect(component.f.repeatPassword.errors).toEqual({"required": true})

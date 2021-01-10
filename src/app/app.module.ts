@@ -12,6 +12,7 @@ import {SquareComponent} from "./tic-tac-toe/square.component";
 import {ReactiveFormsModule} from '@angular/forms';
 import {RegisterFormComponent} from './register-form/register-form.component';
 import { LoginComponent } from './login/login.component';
+import {AlertModule} from "./alert-component/alert.module";
 
 
 @NgModule({
@@ -29,7 +30,8 @@ import { LoginComponent } from './login/login.component';
     BrowserModule,
     HttpClientModule,
     ReactiveFormsModule,
-    RouterModule.forRoot(NavigationRoutes)
+    RouterModule.forRoot(NavigationRoutes),
+    AlertModule
   ],
   providers: [],
   bootstrap: [AppComponent]
