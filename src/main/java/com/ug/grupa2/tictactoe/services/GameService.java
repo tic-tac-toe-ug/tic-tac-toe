@@ -1,7 +1,7 @@
 package com.ug.grupa2.tictactoe.services;
 
 import com.ug.grupa2.tictactoe.GameEntityRepository;
-import com.ug.grupa2.tictactoe.entities.GameEntity;
+import com.ug.grupa2.tictactoe.entities.Game;
 import com.ug.grupa2.tictactoe.enums.GameStatus;
 import com.ug.grupa2.tictactoe.enums.MoveResult;
 import lombok.RequiredArgsConstructor;
@@ -19,83 +19,91 @@ public class GameService {
 
   private final GameEntityRepository gameRepository;
 
-  public GameEntity createGame(String user1) {
-    GameEntity newGame = new GameEntity(user1);
+  public Game createGame(String user1) {
+    Game newGame = new Game(user1);
     this.saveGame(newGame);
     return newGame;
   }
 
-  public List<GameEntity> getGames() {
+  public List<Game> getGames() {
     return this.gameRepository.findAll();
   }
 
-  public void deleteGame(Long id) {
-    GameEntity gameEntity = getGameById(id);
-    this.gameRepository.delete(gameEntity);
+  public List<Game> getGamesByStatus(String status) {
+    if (status.equals("created"))
+      return this.gameRepository.findByGameStatus(GameStatus.CREATED);
+    else
+      return this.gameRepository.findAll();
+
   }
 
-  public MoveResult playGame(GameEntity gameEntity, String userId, Integer move) {
-    MoveResult result = isMoveValid(gameEntity, userId, move);
+  public void deleteGame(Long id) {
+    Game game = getGameById(id);
+    this.gameRepository.delete(game);
+  }
+
+  public MoveResult playGame(Game game, String userId, Integer move) {
+    MoveResult result = isMoveValid(game, userId, move);
     // If the requested move is invalid, return bad request.
     if (result != MoveResult.VALID_MOVE) {
       return result;
     }
-    int[] moves = gameEntity.getMoves();
+    int[] moves = game.getMoves();
     // Mark the player's move
     // Player 1 -> 1
     // Player 2 -> 2
-    if (gameEntity.getUser1().equals(userId)) {
+    if (game.getUser1().equals(userId)) {
       moves[move - 1] = 1;
-      gameEntity.setFirstToMove(gameEntity.getUser2());
+      game.setFirstToMove(game.getUser2());
     } else {
       moves[move - 1] = 2;
-      gameEntity.setFirstToMove(gameEntity.getUser1());
+      game.setFirstToMove(game.getUser1());
     }
-    gameEntity.setMoves(moves);
+    game.setMoves(moves);
 
-    MoveResult gameResult = getGameResult(gameEntity);
-    this.saveGame(gameEntity);
+    MoveResult gameResult = getGameResult(game);
+    this.saveGame(game);
     return gameResult;
   }
 
-  public boolean joinGame(GameEntity gameEntity, String userId) {
+  public boolean joinGame(Game game, String userId) {
 
     // If the game is full, return 400
-    if (gameEntity.getUser2() != null) {
+    if (game.getUser2() != null) {
       return false;
     }
 
     // If game is in progress or done, return 400
-    if (gameEntity.getGameStatus() != GameStatus.CREATED) {
+    if (game.getGameStatus() != GameStatus.CREATED) {
       return false;
     }
 
     // Set this user as an opponent in the game
-    gameEntity.setUser2(userId);
+    game.setUser2(userId);
 
     // Randomly select starting person
     Random generator = new Random();
     if (generator.nextInt(2) == 0)
-      gameEntity.setFirstToMove(gameEntity.getUser1());
+      game.setFirstToMove(game.getUser1());
     else
-      gameEntity.setFirstToMove(userId);
-    gameEntity.setGameStatus(GameStatus.IN_PROGRESS);
-    this.saveGame(gameEntity);
+      game.setFirstToMove(userId);
+    game.setGameStatus(GameStatus.IN_PROGRESS);
+    this.saveGame(game);
     return true;
   }
 
-  public GameEntity getGameById(Long id) {
-    Optional<GameEntity> optGame = this.gameRepository.findById(id);
-    return optGame.orElseThrow(() ->new ResponseStatusException(
+  public Game getGameById(Long id) {
+    Optional<Game> optGame = this.gameRepository.findById(id);
+    return optGame.orElseThrow(() -> new ResponseStatusException(
       HttpStatus.NOT_FOUND, "game not found"
     ));
   }
 
-  public void saveGame(GameEntity game) {
+  public void saveGame(Game game) {
     this.gameRepository.save(game);
   }
 
-  private MoveResult getGameResult(GameEntity gameEntity) {
+  private MoveResult getGameResult(Game game) {
     // The easiest way is to check all possibilities, since it's 3x3 - we can afford it
     int[][] endConditions = {
       {1, 2, 3},
@@ -107,42 +115,42 @@ public class GameService {
       {1, 5, 9},
       {3, 5, 7}
     };
-    int[] moves = gameEntity.getMoves();
+    int[] moves = game.getMoves();
     for (int i = 0; i < 8; i++) {
       if (moves[endConditions[i][0] - 1] == 1 && moves[endConditions[i][1] - 1] == 1 && moves[endConditions[i][2] - 1] == 1) {
-        gameEntity.setGameStatus(GameStatus.USER1_WON);
+        game.setGameStatus(GameStatus.USER1_WON);
         return MoveResult.USER1_WON;
       } else if (moves[endConditions[i][0] - 1] == 2 && moves[endConditions[i][1] - 1] == 2 && moves[endConditions[i][2] - 1] == 2) {
-        gameEntity.setGameStatus(GameStatus.USER2_WON);
+        game.setGameStatus(GameStatus.USER2_WON);
         return MoveResult.USER2_WON;
       }
     }
 
     // look for tie
     if (IntStream.of(moves).noneMatch(x -> x == 0)) {
-      gameEntity.setGameStatus(GameStatus.TIE);
+      game.setGameStatus(GameStatus.TIE);
       return MoveResult.TIE;
     }
     return MoveResult.VALID_MOVE;
   }
 
-  private MoveResult isMoveValid(GameEntity gameEntity, String userId, Integer move) {
-    if (!Objects.equals(gameEntity.getUser1(), userId) && !Objects.equals(gameEntity.getUser2(), userId)) {
+  private MoveResult isMoveValid(Game game, String userId, Integer move) {
+    if (!Objects.equals(game.getUser1(), userId) && !Objects.equals(game.getUser2(), userId)) {
       return MoveResult.UNAUTHORIZED;
     }
 
     // As long as the game only has 1 person, it is impossible to play
-    if (gameEntity.getUser1() == null || gameEntity.getUser2() == null) {
+    if (game.getUser1() == null || game.getUser2() == null) {
       return MoveResult.INVALID_MOVE;
     }
 
     // You can play only 'in progress' game
-    if (gameEntity.getGameStatus() != GameStatus.IN_PROGRESS) {
+    if (game.getGameStatus() != GameStatus.IN_PROGRESS) {
       return MoveResult.INVALID_MOVE;
     }
 
     // If this is not userId's turn
-    if (!gameEntity.getFirstToMove().equals(userId)) {
+    if (!game.getFirstToMove().equals(userId)) {
       return MoveResult.INVALID_MOVE;
     }
     // Each element in moves array represents specific player's move.
@@ -155,7 +163,7 @@ public class GameService {
     }
 
     // Check if this move is possible
-    int[] moves = gameEntity.getMoves();
+    int[] moves = game.getMoves();
     if (moves[move - 1] != 0) {
       return MoveResult.INVALID_MOVE;
     }

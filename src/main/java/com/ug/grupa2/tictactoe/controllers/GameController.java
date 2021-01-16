@@ -1,6 +1,6 @@
 package com.ug.grupa2.tictactoe.controllers;
 
-import com.ug.grupa2.tictactoe.entities.GameEntity;
+import com.ug.grupa2.tictactoe.entities.Game;
 import com.ug.grupa2.tictactoe.enums.MoveResult;
 import com.ug.grupa2.tictactoe.services.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,25 +21,27 @@ public class GameController {
     this.gameService = gameService;
   }
 
-  @GetMapping("/")
+  @GetMapping()
   @ResponseBody
-  public List<GameEntity> get() {
-
-    return this.gameService.getGames();
+  public List<Game> get(@RequestParam(required = false, defaultValue = "") String status) {
+    if (!status.equals(""))
+      return this.gameService.getGamesByStatus(status);
+    else
+      return this.gameService.getGames();
   }
 
   @GetMapping("/{id}")
   @ResponseBody
-  public GameEntity getGame(@PathVariable("id") Long id) {
+  public Game getGame(@PathVariable("id") Long id) {
     return this.gameService.getGameById(id);
   }
 
 
   @PutMapping("/create")
   @ResponseBody
-  public GameEntity createGame(@RequestParam String user) {
+  public ResponseEntity<Game> createGame(@RequestParam String user) {
     // create new game in database
-    return this.gameService.createGame(user);
+    return ResponseEntity.ok(this.gameService.createGame(user));
   }
 
   @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
@@ -53,20 +55,20 @@ public class GameController {
   @RequestMapping(value = "{id}/join", method = RequestMethod.POST)
   @ResponseBody
   public ResponseEntity<String> joinGame(@PathVariable("id") Long id, @RequestParam String userId) {
-    GameEntity gameEntity = this.gameService.getGameById(id);
-    if (this.gameService.joinGame(gameEntity, userId)){
+    Game game = this.gameService.getGameById(id);
+    if (this.gameService.joinGame(game, userId)) {
       return new ResponseEntity<String>(HttpStatus.OK);
-    }
-    else{
+    } else {
       return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
     }
   }
 
-  @RequestMapping(value = "{id}/play", method = RequestMethod.POST)
+  @RequestMapping(value = "{id}/play", method = RequestMethod.POST,
+    produces = "text/plain")
   @ResponseBody
   public ResponseEntity<String> playGame(@PathVariable("id") Long id, @RequestParam String userId, @RequestParam Integer move) {
-    GameEntity gameEntity = this.gameService.getGameById(id);
-    MoveResult result = this.gameService.playGame(gameEntity, userId, move);
+    Game game = this.gameService.getGameById(id);
+    MoveResult result = this.gameService.playGame(game, userId, move);
     return result.toResponse();
   }
 }
