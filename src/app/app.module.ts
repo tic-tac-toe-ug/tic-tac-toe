@@ -14,6 +14,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {RegisterFormComponent} from './register-form/register-form.component';
 import { LoginComponent } from './login/login.component';
 import {AlertModule} from "./alert-component/alert.module";
+import { RankingComponent } from './ranking/ranking.component';
 
 
 @NgModule({
@@ -26,7 +27,8 @@ import {AlertModule} from "./alert-component/alert.module";
     JoinGameComponent,
     SquareComponent,
     RegisterFormComponent,
-    LoginComponent
+    LoginComponent,
+    RankingComponent
   ],
   imports: [
     BrowserModule,
