@@ -2,12 +2,11 @@ package com.ug.grupa2.tictactoe.services;
 
 import com.ug.grupa2.tictactoe.UserRepository;
 import com.ug.grupa2.tictactoe.controllers.dto.RegistrationFrom;
-import com.ug.grupa2.tictactoe.controllers.dto.UserRankingStats;
+import com.ug.grupa2.tictactoe.controllers.dto.UserDetails;
 import com.ug.grupa2.tictactoe.entities.User;
 import com.ug.grupa2.tictactoe.utils.exceptions.UserAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -28,12 +27,12 @@ public class UserService implements UserDetailsService {
     return saveUser(registrationFrom);
   }
 
-  public Optional<UserRankingStats> getUserRankingStats(Long id) {
-    return userRepository.findById(id).map(UserRankingStats::of);
+  public Optional<UserDetails> getUserDetails(Long id) {
+    return userRepository.findById(id).map(UserDetails::of);
   }
 
   @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+  public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     User user = userRepository.findByUsername(username);
     if (user != null) {
       return user;

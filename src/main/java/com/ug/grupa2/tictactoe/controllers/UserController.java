@@ -1,7 +1,7 @@
 package com.ug.grupa2.tictactoe.controllers;
 
 import com.ug.grupa2.tictactoe.controllers.dto.RegistrationFrom;
-import com.ug.grupa2.tictactoe.controllers.dto.UserRankingStats;
+import com.ug.grupa2.tictactoe.controllers.dto.UserDetails;
 import com.ug.grupa2.tictactoe.entities.User;
 import com.ug.grupa2.tictactoe.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ public class UserController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<UserRankingStats> getUser(@PathVariable Long id) {
-    return ResponseEntity.of(userService.getUserRankingStats(id));
+  public ResponseEntity<UserDetails> getUser(@PathVariable Long id) {
+    return ResponseEntity.of(userService.getUserDetails(id));
   }
 }

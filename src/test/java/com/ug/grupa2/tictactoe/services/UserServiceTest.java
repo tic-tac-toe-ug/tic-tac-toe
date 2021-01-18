@@ -2,7 +2,7 @@ package com.ug.grupa2.tictactoe.services;
 
 import com.ug.grupa2.tictactoe.UserRepository;
 import com.ug.grupa2.tictactoe.controllers.dto.RegistrationFrom;
-import com.ug.grupa2.tictactoe.controllers.dto.UserRankingStats;
+import com.ug.grupa2.tictactoe.controllers.dto.UserDetails;
 import com.ug.grupa2.tictactoe.entities.User;
 import com.ug.grupa2.tictactoe.utils.exceptions.UserAlreadyExistsException;
 import org.junit.jupiter.api.BeforeEach;
@@ -80,7 +80,7 @@ public class UserServiceTest {
     when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
     //WHEN
-    Optional<UserRankingStats> result = userService.getUserRankingStats(ID);
+    Optional<UserDetails> result = userService.getUserDetails(ID);
 
     //THEN
     assertTrue(result.isPresent());
@@ -92,7 +92,7 @@ public class UserServiceTest {
     when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
     //WHEN
-    Optional<UserRankingStats> result = userService.getUserRankingStats(ID);
+    Optional<UserDetails> result = userService.getUserDetails(ID);
 
     //THEN
     assertFalse(result.isPresent());

@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 
 @Data
 @Builder(access = AccessLevel.PACKAGE)
-public class UserRankingStats {
+public class UserDetails {
 
   @NotNull
   @NotBlank(message = "Login can not be empty")
@@ -22,7 +22,7 @@ public class UserRankingStats {
 
   private final Long rank;
 
-  public static UserRankingStats of(User user) {
+  public static UserDetails of(User user) {
     return builder().login(user.getUsername())
       .score(user.getScore())
       .rank(user.getRank())
