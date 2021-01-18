@@ -1,6 +1,7 @@
 package com.ug.grupa2.tictactoe.services;
 
 import com.ug.grupa2.tictactoe.UserRepository;
+import com.ug.grupa2.tictactoe.controllers.dto.Ranking;
 import com.ug.grupa2.tictactoe.controllers.dto.RegistrationFrom;
 import com.ug.grupa2.tictactoe.controllers.dto.UserDetails;
 import com.ug.grupa2.tictactoe.entities.User;
@@ -11,7 +12,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -28,7 +33,15 @@ public class UserService implements UserDetailsService {
   }
 
   public Optional<UserDetails> getUserDetails(Long id) {
-    return userRepository.findById(id).map(UserDetails::of);
+    return userRepository.findById(id).map(getUserDetailsWithUpdatedRank());
+  }
+
+
+  //TODO: Confirm paging or other sorting type.
+  public Ranking getUsersRanking() {
+    List<User> usersByScore = getUsersByScore();
+
+    return Ranking.from(usersByScore);
   }
 
   @Override
@@ -58,5 +71,22 @@ public class UserService implements UserDetailsService {
       .build();
 
     return userRepository.save(build);
+  }
+
+  private List<User> getUsersByScore() {
+    return Collections.unmodifiableList(new ArrayList<>(userRepository.findByOrderByScoreDesc()));
+  }
+
+  private int getCurrentRankPosition(User user) {
+    return getUsersByScore().indexOf(user);
+  }
+
+  private Function<User, UserDetails> getUserDetailsWithUpdatedRank() {
+    return user -> {
+      int newRankPosition = getCurrentRankPosition(user);
+      UserDetails details = UserDetails.of(user);
+
+      return details.updateRank(details, (long) newRankPosition);
+    };
   }
 }
