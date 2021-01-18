@@ -3,6 +3,7 @@ package com.ug.grupa2.tictactoe.controllers.dto;
 import com.ug.grupa2.tictactoe.utils.validators.PasswordValueMatch;
 import com.ug.grupa2.tictactoe.utils.validators.ValidPassword;
 import lombok.Data;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -38,4 +39,10 @@ public class RegistrationFrom {
   @NotBlank
   @Email
   private final String email;
+
+  //TODO:Temporary. To be moved.
+  public RegistrationFrom getFormWithEncodedPassword(PasswordEncoder passwordEncoder) {
+    return new RegistrationFrom(this.login, passwordEncoder.encode(this.password),
+      passwordEncoder.encode(this.confirmPassword), this.email);
+  }
 }

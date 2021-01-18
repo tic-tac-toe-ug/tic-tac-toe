@@ -2,7 +2,7 @@ package com.ug.grupa2.tictactoe.services;
 
 import com.ug.grupa2.tictactoe.UserRepository;
 import com.ug.grupa2.tictactoe.controllers.dto.RegistrationFrom;
-import com.ug.grupa2.tictactoe.controllers.dto.UserDetails;
+import com.ug.grupa2.tictactoe.controllers.dto.UserRankingStats;
 import com.ug.grupa2.tictactoe.entities.User;
 import com.ug.grupa2.tictactoe.utils.exceptions.UserAlreadyExistsException;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,13 +52,13 @@ public class UserServiceTest {
   @Test
   public void registerUserShouldCreateUserWhenUserDoesNotExists() {
     //GIVEN
-    when(userRepository.existsByLoginOrEmail(anyString(), anyString())).thenReturn(false);
+    when(userRepository.existsByUsernameOrEmail(anyString(), anyString())).thenReturn(false);
     when(userRepository.save(any())).thenReturn(user);
 
     //WHEN
     User result = userService.registerUser(registrationFrom);
 
-    assertEquals(LOGIN, result.getLogin());
+    assertEquals(LOGIN, result.getUsername());
     assertEquals(EMAIL, result.getEmail());
     assertEquals(PASSWORD, result.getPassword());
     assertEquals(INITIAL_SCORE, result.getScore());
@@ -68,7 +68,7 @@ public class UserServiceTest {
   @Test
   public void registerUserShouldThrowExceptionWhenUserExists() {
     //GIVEN
-    when(userRepository.existsByLoginOrEmail(anyString(), anyString())).thenReturn(true);
+    when(userRepository.existsByUsernameOrEmail(anyString(), anyString())).thenReturn(true);
 
     //THEN
     assertThrows(UserAlreadyExistsException.class, () -> userService.registerUser(registrationFrom));
@@ -80,7 +80,7 @@ public class UserServiceTest {
     when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
     //WHEN
-    Optional<UserDetails> result = userService.getUserDetails(ID);
+    Optional<UserRankingStats> result = userService.getUserRankingStats(ID);
 
     //THEN
     assertTrue(result.isPresent());
@@ -92,7 +92,7 @@ public class UserServiceTest {
     when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
     //WHEN
-    Optional<UserDetails> result = userService.getUserDetails(ID);
+    Optional<UserRankingStats> result = userService.getUserRankingStats(ID);
 
     //THEN
     assertFalse(result.isPresent());
@@ -101,7 +101,7 @@ public class UserServiceTest {
   private User getUser() {
     return User.builder()
       .id(ID)
-      .login(LOGIN)
+      .username(LOGIN)
       .email(EMAIL)
       .password(PASSWORD)
       .rank(INITIAL_RANK)
