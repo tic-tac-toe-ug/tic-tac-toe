@@ -8,6 +8,8 @@ import com.ug.grupa2.tictactoe.entities.User;
 import com.ug.grupa2.tictactoe.utils.exceptions.UserAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,7 +20,7 @@ import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class UserService {
+public class UserService implements UserDetailsService {
 
   private static final Long INITIAL_SCORE = 0L;
 
@@ -42,16 +44,26 @@ public class UserService {
     return Ranking.from(usersByScore);
   }
 
-  private boolean isUserRegistered(RegistrationFrom registrationFrom) {
-    return userRepository.existsByLoginOrEmail(registrationFrom.getLogin(), registrationFrom.getEmail());
+  @Override
+  public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    User user = userRepository.findByUsername(username);
+    if (user != null) {
+      return user;
+    }
+    throw new UsernameNotFoundException(
+      "User '" + username + "' not found");
   }
 
+  private boolean isUserRegistered(RegistrationFrom registrationFrom) {
+    return userRepository.existsByUsernameOrEmail(registrationFrom.getLogin(), registrationFrom.getEmail());
+  }
   //TODO: Add password encoding.
+
   private User saveUser(RegistrationFrom registrationFrom) {
     long numberOfUsers = userRepository.count();
 
     User build = User.builder()
-      .login(registrationFrom.getLogin())
+      .username(registrationFrom.getLogin())
       .email(registrationFrom.getEmail())
       .password(registrationFrom.getPassword())
       .score(INITIAL_SCORE)

@@ -23,7 +23,7 @@ public class UserDetails {
   private final Long rank;
 
   public static UserDetails of(User user) {
-    return builder().login(user.getLogin())
+    return builder().login(user.getUsername())
       .score(user.getScore())
       .rank(user.getRank())
       .build();

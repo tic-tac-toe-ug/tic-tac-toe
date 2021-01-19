@@ -51,13 +51,13 @@ public class UserServiceTest {
   @Test
   public void registerUserShouldCreateUserWhenUserDoesNotExists() {
     //GIVEN
-    when(userRepository.existsByLoginOrEmail(anyString(), anyString())).thenReturn(false);
+    when(userRepository.existsByUsernameOrEmail(anyString(), anyString())).thenReturn(false);
     when(userRepository.save(any())).thenReturn(user);
 
     //WHEN
     User result = userService.registerUser(registrationFrom);
 
-    assertEquals(LOGIN, result.getLogin());
+    assertEquals(LOGIN, result.getUsername());
     assertEquals(EMAIL, result.getEmail());
     assertEquals(PASSWORD, result.getPassword());
     assertEquals(INITIAL_SCORE, result.getScore());
@@ -67,7 +67,7 @@ public class UserServiceTest {
   @Test
   public void registerUserShouldThrowExceptionWhenUserExists() {
     //GIVEN
-    when(userRepository.existsByLoginOrEmail(anyString(), anyString())).thenReturn(true);
+    when(userRepository.existsByUsernameOrEmail(anyString(), anyString())).thenReturn(true);
 
     //THEN
     assertThrows(UserAlreadyExistsException.class, () -> userService.registerUser(registrationFrom));
@@ -125,7 +125,7 @@ public class UserServiceTest {
   private User getUser() {
     return User.builder()
       .id(ID)
-      .login(LOGIN)
+      .username(LOGIN)
       .email(EMAIL)
       .password(PASSWORD)
       .rank(INITIAL_RANK)

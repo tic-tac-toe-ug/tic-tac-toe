@@ -9,7 +9,9 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-  boolean existsByLoginOrEmail(String login, String email);
+  boolean existsByUsernameOrEmail(String login, String email);
+
+  User findByUsername(String username);
 
   List<User> findByOrderByScoreDesc();
 }
