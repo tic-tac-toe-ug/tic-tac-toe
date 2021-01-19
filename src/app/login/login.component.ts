@@ -1,5 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {SecurityService} from "./security.service";
+import {AlertService} from "../alert-component/alert.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-login',
@@ -11,7 +14,10 @@ export class LoginComponent implements OnInit {
   submitted = false;
 
   constructor(
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private alertService: AlertService,
+    private router: Router,
+    private security: SecurityService
   ) {
 
   }
@@ -35,7 +41,21 @@ export class LoginComponent implements OnInit {
     if (this.form.invalid) {
       return;
     }
-
+    let formData = new FormData();
+    formData.append('username', this.form.getRawValue().username)
+    formData.append('password', this.form.getRawValue().password)
+    this.security.login(formData)
+      .subscribe(
+        (data) => {
+          this.alertService.success("Zalogowano!", {keepAfterRouteChange: true});
+          this.router.navigateByUrl("/join-game")
+        },
+        (err) => {
+          this.alertService.error(err.toString())
+        })
+    if (this.security.user != undefined) {
+      console.log("ZLAOGOWANO FEST!")
+    }
     this.loading = true;
   }
 
