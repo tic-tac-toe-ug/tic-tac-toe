@@ -31,7 +31,6 @@ public class GameServiceTest {
   private static final String USER1 = "user1";
   private static final String USER2 = "user2";
   private static final int[] MOVES = new int[9];
-  private static final GameStatus GAME_STATUS = GameStatus.CREATED;
 
   private static final int USER1_MARK = 1;
   private static final int USER2_MARK = 2;
@@ -311,6 +310,6 @@ public class GameServiceTest {
       .user2(USER2)
       .firstToMove(USER1)
       .moves(MOVES)
-      .gameStatus(GAME_STATUS).build();
+      .gameStatus(GameStatus.CREATED).build();
   }
 }
