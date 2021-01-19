@@ -15,6 +15,7 @@ import {RegisterFormComponent} from './register-form/register-form.component';
 import { LoginComponent } from './login/login.component';
 import {AlertModule} from "./alert-component/alert.module";
 import { RankingComponent } from './ranking/ranking.component';
+import {SecurityService} from "./login/security.service";
 
 
 @NgModule({
@@ -37,7 +38,7 @@ import { RankingComponent } from './ranking/ranking.component';
     RouterModule.forRoot(NavigationRoutes),
     AlertModule
   ],
-  providers: [],
+  providers: [SecurityService],
   bootstrap: [AppComponent]
 })
 export class AppModule {
