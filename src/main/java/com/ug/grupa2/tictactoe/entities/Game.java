@@ -1,10 +1,7 @@
 package com.ug.grupa2.tictactoe.entities;
 
 import com.ug.grupa2.tictactoe.enums.GameStatus;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -15,6 +12,7 @@ import java.sql.Timestamp;
 @lombok.Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Game {
 
   @Id
