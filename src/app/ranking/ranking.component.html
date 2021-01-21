@@ -9,7 +9,7 @@
   <tbody>
   <tr *ngFor="let entry of entries">
     <th scope="row">{{entry.rank}}</th>
-    <td>{{entry.login}}</td>
+    <td><a [routerLink]="['/user', entry.login]">{{entry.login}}</a></td>
     <td>{{entry.score}}</td>
   </tr>
   </tbody>

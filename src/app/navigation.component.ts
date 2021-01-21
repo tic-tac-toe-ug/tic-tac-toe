@@ -9,6 +9,7 @@ import {LoginComponent} from "./login/login.component";
 import {RankingComponent} from "./ranking/ranking.component";
 import {SecurityService} from "./login/security.service";
 import {AlertService} from "./alert-component/alert.service";
+import {ShowUserComponent} from "./user/show-user.component";
 
 @Component({
   selector: 'app-navigation',
@@ -48,5 +49,6 @@ export const NavigationRoutes: Routes = [
   {path: 'register-form', component: RegisterFormComponent},
   {path: 'ranking', component: RankingComponent},
   {path: 'login-form', component: LoginComponent},
+  {path: 'user/:username', component: ShowUserComponent},
   {path: '**', component: PageNotFoundComponent}
 ]

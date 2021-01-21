@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {UserService} from "../user/user.service";
 import {UserForm} from "../user/userForm";
-import {User} from "../user/user";
+import {BasicUser} from "../user/basicUser";
 import {AlertService} from "../alert-component/alert.service";
 import {Router} from "@angular/router";
 
@@ -56,7 +56,7 @@ export class RegisterFormComponent implements OnInit {
         this.form.getRawValue().email
       )
     ).subscribe(
-      (user: User) => {
+      (user: BasicUser) => {
         this.alertService.success("Rejestracja się powiodła!", {keepAfterRouteChange: true});
         this.router.navigateByUrl("/login-form")
       },

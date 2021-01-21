@@ -17,6 +17,7 @@ import {AlertModule} from "./alert-component/alert.module";
 import {RankingComponent} from './ranking/ranking.component';
 import {SecurityService} from "./login/security.service";
 import {CookieService} from 'ng2-cookies';
+import {ShowUserComponent} from "./user/show-user.component";
 
 
 @NgModule({
@@ -30,7 +31,8 @@ import {CookieService} from 'ng2-cookies';
     SquareComponent,
     RegisterFormComponent,
     LoginComponent,
-    RankingComponent
+    RankingComponent,
+    ShowUserComponent
   ],
   imports: [
     BrowserModule,

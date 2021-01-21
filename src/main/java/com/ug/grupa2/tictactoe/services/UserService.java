@@ -44,6 +44,11 @@ public class UserService implements UserDetailsService {
     return Ranking.from(usersByScore);
   }
 
+  public Optional<User> loadUserByUsernameWithoutPassword(String username) {
+    return Optional.ofNullable(this.userRepository.findByUsername(username))
+      .map(user -> user.withPassword(""));
+  }
+
   @Override
   public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     User user = userRepository.findByUsername(username);
