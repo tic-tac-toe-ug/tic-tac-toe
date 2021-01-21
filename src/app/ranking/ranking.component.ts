@@ -1,7 +1,7 @@
 import {Component, Injectable, OnInit} from '@angular/core';
 import {UserService} from "../user/user.service";
-import {Ranking} from "../user/ranking";
-import {RankingEntry} from "../user/ranking-entry";
+import {Ranking} from "./ranking";
+import {RankingEntry} from "./ranking-entry";
 import {AlertService} from "../alert-component/alert.service";
 
 @Component({

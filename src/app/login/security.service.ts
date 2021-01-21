@@ -1,7 +1,9 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpRequest} from "@angular/common/http";
 import {map} from "rxjs/operators";
 import {CookieService} from 'ng2-cookies';
+import {Observable} from "rxjs";
+import {Ranking} from "../ranking/ranking";
 
 @Injectable()
 export class SecurityService {
@@ -31,10 +33,10 @@ export class SecurityService {
             data.name,
             data.principal.email,
             data.authorities.map((e: any) => e.authority),
-            data.details.sessionId
+            data.details.sessionId,
+            data.principal.password
           );
           this.cookies.set(SecurityService.CookieName, JSON.stringify(userDetails))
-          console.log("I HAVE SET COOKIE!")
           this.user = userDetails
           return userDetails;
         })
@@ -65,14 +67,16 @@ export class UserDetails {
   email: string;
   roles: string[];
   sessionId: string;
+  auth: string;
 
 
-  constructor(id: number, username: string, email: string, roles: string[], sessionId: string) {
+  constructor(id: number, username: string, email: string, roles: string[], sessionId: string, password: string) {
     this.id = id;
     this.username = username;
     this.email = email;
     this.roles = roles;
     this.sessionId = sessionId;
+    this.auth = username + ":" + password;
   }
 }
 
