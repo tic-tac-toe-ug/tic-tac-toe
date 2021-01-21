@@ -5,6 +5,7 @@ import com.ug.grupa2.tictactoe.controllers.dto.Ranking;
 import com.ug.grupa2.tictactoe.controllers.dto.RegistrationFrom;
 import com.ug.grupa2.tictactoe.controllers.dto.UserDetails;
 import com.ug.grupa2.tictactoe.entities.User;
+import com.ug.grupa2.tictactoe.enums.MoveResult;
 import com.ug.grupa2.tictactoe.utils.exceptions.UserAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,8 @@ import java.util.function.Function;
 public class UserService implements UserDetailsService {
 
   private static final Long INITIAL_SCORE = 0L;
+  public static final Long POINTS_FOR_WINNING_GAME = 3L;
+  public static final Long POINTS_FOR_TIE = 1L;
 
   private final UserRepository userRepository;
 
@@ -36,33 +39,48 @@ public class UserService implements UserDetailsService {
     return userRepository.findById(id).map(getUserDetailsWithUpdatedRank());
   }
 
-
-  //TODO: Confirm paging or other sorting type.
   public Ranking getUsersRanking() {
     List<User> usersByScore = getUsersByScore();
+    //TODO: Temporary :>
+    long index = 1;
+    for (User user : usersByScore) {
+      user.setRank(index++);
+    }
 
     return Ranking.from(usersByScore);
   }
 
   public Optional<User> loadUserByUsernameWithoutPassword(String username) {
-    return Optional.ofNullable(this.userRepository.findByUsername(username))
+    return userRepository.findByUsername(username)
       .map(user -> user.withPassword(""));
   }
 
   @Override
   public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    User user = userRepository.findByUsername(username);
-    if (user != null) {
-      return user;
+    return userRepository.findByUsername(username)
+      .orElseThrow(() -> new UsernameNotFoundException("User '" + username + "' not found"));
+  }
+
+  void updateUsersScore(MoveResult gameResult, String user1, String user2) {
+    if (MoveResult.USER1_WON == gameResult) {
+      updateUsersScore(user1, POINTS_FOR_WINNING_GAME);
     }
-    throw new UsernameNotFoundException(
-      "User '" + username + "' not found");
+    if (MoveResult.USER2_WON == gameResult) {
+      updateUsersScore(user2, POINTS_FOR_WINNING_GAME);
+    }
+    if (MoveResult.TIE == gameResult) {
+      updateUsersScore(user1, POINTS_FOR_TIE);
+      updateUsersScore(user2, POINTS_FOR_TIE);
+    }
+  }
+
+  private void updateUsersScore(String user1, Long points) {
+    userRepository.findByUsername(user1).ifPresent(u -> u.setScore(u.getScore() + points));
   }
 
   private boolean isUserRegistered(RegistrationFrom registrationFrom) {
     return userRepository.existsByUsernameOrEmail(registrationFrom.getLogin(), registrationFrom.getEmail());
   }
-  //TODO: Add password encoding.
 
   private User saveUser(RegistrationFrom registrationFrom) {
     long numberOfUsers = userRepository.count();

@@ -5,6 +5,7 @@ import com.ug.grupa2.tictactoe.controllers.dto.Ranking;
 import com.ug.grupa2.tictactoe.controllers.dto.RegistrationFrom;
 import com.ug.grupa2.tictactoe.controllers.dto.UserDetails;
 import com.ug.grupa2.tictactoe.entities.User;
+import com.ug.grupa2.tictactoe.enums.MoveResult;
 import com.ug.grupa2.tictactoe.utils.exceptions.UserAlreadyExistsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,8 @@ public class UserServiceTest {
   private static final String PASSWORD = "password";
   private static final String REPEATED_PASSWORD = "password";
   private static final String EMAIL = "email@edu.pl";
+  private static final String USER1_USERNAME = "user1";
+  private static final String USER2_USERNAME = "user2";
   private static final long INITIAL_RANK = 1L;
   private static final long INITIAL_SCORE = 0L;
 
@@ -120,6 +123,55 @@ public class UserServiceTest {
 
     //THEN
     assertEquals(1, usersRanking.getRanking().size());
+  }
+
+  @Test
+  public void updateUsersScoreShouldUpdateUser1WinningScore() {
+    //GIVEN
+    User user1 = getUser();
+    user1.setUsername(USER1_USERNAME);
+
+    when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user1));
+
+    //WHEN
+    userService.updateUsersScore(MoveResult.USER1_WON, USER1_USERNAME, USER2_USERNAME);
+
+    //THEN
+    assertEquals(3, user1.getScore());
+  }
+
+  @Test
+  public void updateUsersScoreShouldUpdateUser2WinningScore() {
+    //GIVEN
+    User user2 = getUser();
+    user2.setUsername(USER2_USERNAME);
+
+    when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user2));
+
+    //WHEN
+    userService.updateUsersScore(MoveResult.USER2_WON, USER1_USERNAME, USER2_USERNAME);
+
+    //THEN
+    assertEquals(3, user2.getScore());
+  }
+
+  @Test
+  public void updateUsersScoreShouldUpdateBothUsersTieScore() {
+    //GIVEN
+    User user1 = getUser();
+    user1.setUsername(USER1_USERNAME);
+    User user2 = getUser();
+    user2.setUsername(USER2_USERNAME);
+
+    when(userRepository.findByUsername(user1.getUsername())).thenReturn(Optional.of(user1));
+    when(userRepository.findByUsername(user2.getUsername())).thenReturn(Optional.of(user2));
+
+    //WHEN
+    userService.updateUsersScore(MoveResult.TIE, USER1_USERNAME, USER2_USERNAME);
+
+    //THEN
+    assertEquals(1, user1.getScore());
+    assertEquals(1, user2.getScore());
   }
 
   private User getUser() {

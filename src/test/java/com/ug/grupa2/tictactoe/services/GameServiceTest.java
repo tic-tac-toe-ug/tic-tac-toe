@@ -38,11 +38,14 @@ public class GameServiceTest {
   @Mock
   private GameEntityRepository gameRepository;
 
+  @Mock
+  private UserService userService;
+
   private GameService gameService;
 
   @BeforeEach
   void setUp() {
-    gameService = new GameService(gameRepository);
+    gameService = new GameService(gameRepository, userService);
   }
 
   @Test
