@@ -1,5 +1,5 @@
 import {Component, Injectable} from '@angular/core';
-import {Routes} from "@angular/router";
+import {Router, Routes} from "@angular/router";
 import {HomeComponent} from "./home.component";
 import {PageNotFoundComponent} from "./page-not-found.component";
 import {TicTacToeComponent} from "./tic-tac-toe/tic-tac-toe.component";
@@ -8,6 +8,7 @@ import {RegisterFormComponent} from "./register-form/register-form.component";
 import {LoginComponent} from "./login/login.component";
 import {RankingComponent} from "./ranking/ranking.component";
 import {SecurityService} from "./login/security.service";
+import {AlertService} from "./alert-component/alert.service";
 
 @Component({
   selector: 'app-navigation',
@@ -18,8 +19,24 @@ export class NavigationComponent {
 
   securityService: SecurityService
 
-  constructor(securityService: SecurityService) {
+  constructor(securityService: SecurityService,
+              private alertService: AlertService,
+              private router: Router) {
     this.securityService = securityService;
+  }
+
+  logout() {
+    this.securityService.logout()
+      .subscribe(
+        (_: any) => {
+          this.alertService.success("Wylogowano!", {keepAfterRouteChange: true});
+          this.router.navigateByUrl("/")
+        },
+        (error: any) => {
+          console.log(error)
+          this.alertService.error(error.errors)
+        }
+      )
   }
 
 }
