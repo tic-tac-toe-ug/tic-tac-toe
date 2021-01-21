@@ -12,10 +12,11 @@ import {JoinGameComponent} from './tic-tac-toe/join-game.component'
 import {SquareComponent} from "./tic-tac-toe/square.component";
 import {ReactiveFormsModule} from '@angular/forms';
 import {RegisterFormComponent} from './register-form/register-form.component';
-import { LoginComponent } from './login/login.component';
+import {LoginComponent} from './login/login.component';
 import {AlertModule} from "./alert-component/alert.module";
-import { RankingComponent } from './ranking/ranking.component';
+import {RankingComponent} from './ranking/ranking.component';
 import {SecurityService} from "./login/security.service";
+import {CookieService} from 'ng2-cookies';
 
 
 @NgModule({
@@ -38,7 +39,7 @@ import {SecurityService} from "./login/security.service";
     RouterModule.forRoot(NavigationRoutes),
     AlertModule
   ],
-  providers: [SecurityService],
+  providers: [SecurityService, CookieService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

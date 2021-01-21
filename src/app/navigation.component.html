@@ -17,7 +17,7 @@
         <a class="nav-item nav-link" routerLink="/login-form">Zaloguj się</a>
       </ng-container>
       <ng-container *ngIf="securityService.isLogged()">
-        <a class="nav-item nav-link" routerLink="/logout">Wyloguj się</a>
+        <a class="nav-item nav-link" (click)="logout()">Wyloguj się</a>
       </ng-container>
     </div>
   </div>
