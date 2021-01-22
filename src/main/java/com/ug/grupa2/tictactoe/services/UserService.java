@@ -43,7 +43,7 @@ public class UserService implements UserDetailsService {
 
   public Ranking getUsersRanking() {
     List<User> usersByScore = getUsersByScore();
-    //TODO: Temporary :>
+    //TODO: Temporary :> Usunę sortowanie na FE po scorze, bo lista juz wychodzi posortowana wiec rank = index
     long index = 1;
     for (User user : usersByScore) {
       user.setRank(index++);
