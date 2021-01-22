@@ -17,7 +17,11 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class GameService {
 
+  private static final EnumSet<MoveResult> END_GAME_MOVES = EnumSet.of(MoveResult.TIE, MoveResult.USER1_WON,
+    MoveResult.USER2_WON);
+
   private final GameEntityRepository gameRepository;
+  private final UserService userService;
 
   public Game createGame(String user1) {
     Game newGame = new Game(user1);
@@ -62,6 +66,11 @@ public class GameService {
     game.setMoves(moves);
 
     MoveResult gameResult = getGameResult(game);
+
+    if (END_GAME_MOVES.contains(gameResult)) {
+      userService.updateUsersScore(gameResult, game.getUser1(), game.getUser2());
+    }
+
     this.saveGame(game);
     return gameResult;
   }
