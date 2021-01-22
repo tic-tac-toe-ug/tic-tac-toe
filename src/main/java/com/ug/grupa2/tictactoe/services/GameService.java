@@ -7,6 +7,7 @@ import com.ug.grupa2.tictactoe.enums.MoveResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -33,9 +34,9 @@ public class GameService {
     return this.gameRepository.findAll();
   }
 
-  public List<Game> getGamesByStatus(String status) {
+  public List<Game> getGamesByStatusAndNotPrivate(String status) {
     if (status.equals("created"))
-      return this.gameRepository.findByGameStatus(GameStatus.CREATED);
+      return this.gameRepository.findByGameStatusAndPrivateGame(GameStatus.CREATED, false);
     else
       return this.gameRepository.findAll();
 
@@ -76,6 +77,11 @@ public class GameService {
   }
 
   public boolean joinGame(Game game, String userId) {
+    try {
+      userService.loadUserByUsername(userId); // no exception = ok
+    } catch (UsernameNotFoundException e) {
+      return false;
+    }
     // If the game is full, return 400
     if (game.getUser2() != null) {
       return false;
@@ -178,4 +184,5 @@ public class GameService {
 
     return MoveResult.VALID_MOVE;
   }
+
 }

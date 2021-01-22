@@ -1,6 +1,6 @@
 <div class="container-fluid">
   <h1 class="display-4 text-center">{{game.user1}} vs {{game.user2}}</h1>
-  <p class="lead text-center">Ruch wykonuje {{game.firstToMove}}</p>
+  <p class="lead text-center">Ruch wykonuje {{game.firstToMove}} {{player}}</p>
   <div class="">
       <div class="row m-0 p-0 d-flex justify-content-center" *ngFor="let rowIdx of [0, 1, 2]">
         <app-square *ngFor="let val of squares.slice(rowIdx * 3, rowIdx * 3 + 3); let i = index"
