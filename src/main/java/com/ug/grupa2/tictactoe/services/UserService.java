@@ -73,6 +73,7 @@ public class UserService implements UserDetailsService {
       .password(registrationFrom.getPassword())
       .score(INITIAL_SCORE)
       .rank(++numberOfUsers)
+      .roles("ROLE_USER")
       .build();
 
     return userRepository.save(build);

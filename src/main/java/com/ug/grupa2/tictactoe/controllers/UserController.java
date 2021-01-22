@@ -2,12 +2,13 @@ package com.ug.grupa2.tictactoe.controllers;
 
 import com.ug.grupa2.tictactoe.controllers.dto.Ranking;
 import com.ug.grupa2.tictactoe.controllers.dto.RegistrationFrom;
-import com.ug.grupa2.tictactoe.controllers.dto.UserDetails;
 import com.ug.grupa2.tictactoe.entities.User;
 import com.ug.grupa2.tictactoe.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,15 @@ public class UserController {
     User user = userService.registerUser(registrationFrom.getFormWithEncodedPassword(passwordEncoder));
 
     return ResponseEntity.ok(user);
+  }
+
+  @PutMapping("/{id}")
+  public ResponseEntity<Authentication> updateUser(
+    @PathVariable("id") Long id,
+    @RequestBody RegistrationFrom registrationFrom) {
+    // TODO
+    final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    return ResponseEntity.ok(authentication);
   }
 
   @GetMapping("/{username}")

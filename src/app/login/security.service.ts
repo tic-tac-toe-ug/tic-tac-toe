@@ -1,9 +1,7 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpRequest} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {map} from "rxjs/operators";
 import {CookieService} from 'ng2-cookies';
-import {Observable} from "rxjs";
-import {Ranking} from "../ranking/ranking";
 
 @Injectable()
 export class SecurityService {
@@ -59,6 +57,11 @@ export class SecurityService {
     return this.user != undefined
   }
 
+  public isAdmin(): boolean {
+    this.loadCookie();
+    return this.user == undefined ? false : this.user.roles.filter(role => role === 'ROLE_ADMIN').length > 0;
+  }
+
 }
 
 export class UserDetails {
@@ -69,8 +72,12 @@ export class UserDetails {
   sessionId: string;
   auth: string;
 
-
-  constructor(id: number, username: string, email: string, roles: string[], sessionId: string, password: string) {
+  constructor(id: number,
+              username: string,
+              email: string,
+              roles: string[],
+              sessionId: string,
+              password: string) {
     this.id = id;
     this.username = username;
     this.email = email;

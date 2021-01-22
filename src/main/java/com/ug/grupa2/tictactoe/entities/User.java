@@ -7,8 +7,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "user_accounts")
@@ -33,10 +34,14 @@ public class User implements UserDetails {
 
   private Long rank;
 
+  private String roles;
+
   //TODO: Load from database.
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+    return Arrays.stream(this.roles.split(","))
+      .map(SimpleGrantedAuthority::new)
+      .collect(Collectors.toList());
   }
 
   @Override

@@ -1,8 +1,12 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {FullUser} from "./fullUser";
 import {UserService} from "./user.service";
 import {SecurityService} from "../login/security.service";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {UserForm} from "./userForm";
+import {BasicUser} from "./basicUser";
+import {AlertService} from "../alert-component/alert.service";
 
 @Component({
   selector: 'show-user',
@@ -13,9 +17,13 @@ export class ShowUserComponent implements OnInit {
 
   user: FullUser;
   securityService: SecurityService;
+  form: FormGroup;
 
   constructor(private route: ActivatedRoute,
               private userService: UserService,
+              private formBuilder: FormBuilder,
+              private alertService: AlertService,
+              private router: Router,
               securityService: SecurityService) {
     this.securityService = securityService;
   }
@@ -23,6 +31,40 @@ export class ShowUserComponent implements OnInit {
   ngOnInit(): void {
     let username = this.route.snapshot.paramMap.get('username') as string;
     this.userService.getUserByUsername(username)
-      .subscribe(user => this.user = user);
+      .subscribe(user => {
+        this.user = user
+        this.form = this.formBuilder.group({
+          email: [user.email, [Validators.required, Validators.email]],
+          login: [user.username, [Validators.required, Validators.min(3), Validators.max(15)]],
+          password: ['', [Validators.required, Validators.minLength(8)]],
+          repeatPassword: ['', [Validators.required, Validators.minLength(8)]]
+        })
+      });
+  }
+
+  isSelf(): boolean {
+    return this.user.id == this.securityService.user!.id
+  }
+
+  onSubmit() {
+    this.userService.update(
+      this.user.id,
+      new UserForm(
+        this.form.getRawValue().login,
+        this.form.getRawValue().password,
+        this.form.getRawValue().repeatPassword,
+        this.form.getRawValue().email
+      )
+    ).subscribe(
+      (user: any) => {
+        console.log(user);
+        this.alertService.success("Aktualizacja się powiodła!", {keepAfterRouteChange: true});
+        this.router.navigateByUrl("/login-form")
+      },
+      (errorResponse: any) => {
+        console.log(errorResponse)
+        this.alertService.error(errorResponse.toString())
+      }
+    )
   }
 }
