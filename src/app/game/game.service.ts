@@ -15,6 +15,7 @@ export class GameService {
   public create(userName: string) {
     const params = new HttpParams()
       .set('user', userName)
+      .set('privateGame', '1')  // TODO: this is temporary, need to add possibility to choose game type in frontend
     return this.http.put<Game>(this.gamesUrl+"/create", params);
   }
 

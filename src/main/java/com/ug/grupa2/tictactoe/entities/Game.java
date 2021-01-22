@@ -39,10 +39,15 @@ public class Game {
   @Getter
   @Setter
   private GameStatus gameStatus;
+  @Getter
+  @Setter
+  private boolean privateGame;
 
-  public Game(String user1) {
+  public Game(String user1, boolean privateGame) {
     this.user1 = user1;
     this.moves = new int[9];
     this.gameStatus = GameStatus.CREATED;
+    this.privateGame = privateGame;
   }
+
 }

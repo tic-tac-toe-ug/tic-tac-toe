@@ -36,6 +36,7 @@ export class JoinGameComponent implements OnInit {
       login: ['', [Validators.required]]
     });
 
+    // TODO: get only public games
     this.gameService.getJoinableGames().subscribe(
       (games: Game[]) => {
         this.games = games

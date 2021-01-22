@@ -23,8 +23,8 @@ public class GameService {
   private final GameEntityRepository gameRepository;
   private final UserService userService;
 
-  public Game createGame(String user1) {
-    Game newGame = new Game(user1);
+  public Game createGame(String user1, boolean privateGame) {
+    Game newGame = new Game(user1, privateGame);
     this.saveGame(newGame);
     return newGame;
   }
@@ -76,7 +76,6 @@ public class GameService {
   }
 
   public boolean joinGame(Game game, String userId) {
-
     // If the game is full, return 400
     if (game.getUser2() != null) {
       return false;
