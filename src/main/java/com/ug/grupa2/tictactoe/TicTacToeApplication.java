@@ -22,7 +22,7 @@ public class TicTacToeApplication implements CommandLineRunner {
   @Override
   public void run(String... args) throws Exception {
     final String username = "admin";
-    if (this.userRepository.findByUsername(username) == null) {
+    if (!this.userRepository.findByUsername(username).isPresent()) {
       final String adminPass = "S3cr3tAdmin!";
       this.userRepository.save(
         User.builder()

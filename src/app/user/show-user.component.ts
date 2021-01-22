@@ -5,7 +5,6 @@ import {UserService} from "./user.service";
 import {SecurityService} from "../login/security.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {UserForm} from "./userForm";
-import {BasicUser} from "./basicUser";
 import {AlertService} from "../alert-component/alert.service";
 
 @Component({
@@ -34,10 +33,10 @@ export class ShowUserComponent implements OnInit {
       .subscribe(user => {
         this.user = user
         this.form = this.formBuilder.group({
-          email: [user.email, [Validators.required, Validators.email]],
-          login: [user.username, [Validators.required, Validators.min(3), Validators.max(15)]],
-          password: ['', [Validators.required, Validators.minLength(8)]],
-          repeatPassword: ['', [Validators.required, Validators.minLength(8)]]
+          email: [{value: user.email, disabled: !this.securityService.isAdmin()}, [Validators.required, Validators.email]],
+          login: [{value: user.username, disabled: !this.securityService.isAdmin()}, [Validators.required, Validators.min(3), Validators.max(15)]],
+          password: [{value: '', disabled: !(this.isSelf() || this.securityService.isAdmin())}, [Validators.required, Validators.minLength(8)]],
+          repeatPassword: [{value: '', disabled: !(this.isSelf() || this.securityService.isAdmin())}, [Validators.required, Validators.minLength(8)]]
         })
       });
   }
@@ -47,6 +46,7 @@ export class ShowUserComponent implements OnInit {
   }
 
   onSubmit() {
+    console.log(this.form.getRawValue());
     this.userService.update(
       this.user.id,
       new UserForm(
@@ -59,7 +59,7 @@ export class ShowUserComponent implements OnInit {
       (user: any) => {
         console.log(user);
         this.alertService.success("Aktualizacja się powiodła!", {keepAfterRouteChange: true});
-        this.router.navigateByUrl("/login-form")
+        this.router.navigateByUrl("/ranking")
       },
       (errorResponse: any) => {
         console.log(errorResponse)

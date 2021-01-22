@@ -34,7 +34,6 @@ export class NavigationComponent {
           this.router.navigateByUrl("/")
         },
         (error: any) => {
-          console.log(error)
           this.alertService.error(error.errors)
         }
       )

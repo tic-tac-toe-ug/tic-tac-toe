@@ -8,6 +8,8 @@ import com.ug.grupa2.tictactoe.entities.User;
 import com.ug.grupa2.tictactoe.enums.MoveResult;
 import com.ug.grupa2.tictactoe.utils.exceptions.UserAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,9 +20,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@Log4j2
 public class UserService implements UserDetailsService {
 
   private static final Long INITIAL_SCORE = 0L;
@@ -111,6 +115,40 @@ public class UserService implements UserDetailsService {
       UserDetails details = UserDetails.of(user);
 
       return details.updateRank(details, (long) newRankPosition);
+    };
+  }
+
+  public Optional<User> updateUser(Long idOfUserToBeUpdated, RegistrationFrom registrationFrom, User requester) {
+    Optional<User> maybeUpdated = this.userRepository.findById(idOfUserToBeUpdated)
+      .filter(canEditUser(requester, registrationFrom))
+      .map(updateUserWithRegistrationForm(registrationFrom));
+    maybeUpdated.ifPresent(this.userRepository::save);
+    return maybeUpdated;
+  }
+
+  private Function<User, User> updateUserWithRegistrationForm(RegistrationFrom registrationFromWithEncodedPassword) {
+    return existingUser -> {
+      User updatedUser = existingUser;
+      if (!Strings.isEmpty(registrationFromWithEncodedPassword.getEmail())) {
+        updatedUser = updatedUser.withEmail(registrationFromWithEncodedPassword.getEmail());
+      }
+      if (!Strings.isEmpty(registrationFromWithEncodedPassword.getLogin())) {
+        updatedUser = updatedUser.withUsername(registrationFromWithEncodedPassword.getLogin());
+      }
+      if (!Strings.isEmpty(registrationFromWithEncodedPassword.getPassword())) {
+        updatedUser = updatedUser.withPassword(registrationFromWithEncodedPassword.getPassword());
+      }
+      return updatedUser;
+    };
+  }
+
+  private Predicate<User> canEditUser(User requester, RegistrationFrom registrationFrom) {
+    return user -> {
+      // admin can change everything
+      if (requester.getRoles().contains("ADMIN")) return true;
+      // user can only change password
+      return registrationFrom.getLogin().equals(user.getUsername())
+        && registrationFrom.getEmail().equals(user.getEmail());
     };
   }
 }

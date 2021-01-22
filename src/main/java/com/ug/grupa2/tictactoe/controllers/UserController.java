@@ -5,19 +5,21 @@ import com.ug.grupa2.tictactoe.controllers.dto.RegistrationFrom;
 import com.ug.grupa2.tictactoe.entities.User;
 import com.ug.grupa2.tictactoe.services.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@Log4j2
 public class UserController {
 
   private final UserService userService;
@@ -33,12 +35,16 @@ public class UserController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Authentication> updateUser(
+  public ResponseEntity<User> updateUser(
     @PathVariable("id") Long id,
     @RequestBody RegistrationFrom registrationFrom) {
-    // TODO
-    final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    return ResponseEntity.ok(authentication);
+    final User requester = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    log.info("Received id: {}, user form: {}, requestingUser: {}", id, registrationFrom, requester);
+    Optional<User> updatedUser = this.userService.updateUser(
+      id,
+      registrationFrom.getFormWithEncodedPassword(this.passwordEncoder),
+      requester);
+    return ResponseEntity.of(updatedUser.map(user -> user.withPassword("")));
   }
 
   @GetMapping("/{username}")
