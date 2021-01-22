@@ -49,12 +49,13 @@ public class GameServiceTest {
   }
 
   @Test
-  public void createGameShouldCreateGameWithProperUserName() {
+  public void createGameShouldCreateGameWithProperUserNameAndGameType() {
     // WHEN
-    Game result = gameService.createGame(USER1);
+    Game result = gameService.createGame(USER1, true);
 
     // THEN
     assertEquals(USER1, result.getUser1());
+    assertTrue(result.isPrivateGame());
   }
 
   @Test

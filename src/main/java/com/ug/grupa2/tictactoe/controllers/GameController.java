@@ -39,9 +39,12 @@ public class GameController {
 
   @PutMapping("/create")
   @ResponseBody
-  public ResponseEntity<Game> createGame(@RequestParam String user) {
+  public ResponseEntity<Game> createGame(@RequestParam String user, @RequestParam boolean privateGame) {
     // create new game in database
-    return ResponseEntity.ok(this.gameService.createGame(user));
+    // If game is private, frontend should display URL with proper game ID, and then the invited user
+    // can use this link to play. For now no user validation, anyone with link can join private game.
+    // In the future we can provide some random number/string instead of plain ID so it's harder to spoof.
+    return ResponseEntity.ok(this.gameService.createGame(user, privateGame));
   }
 
   @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
@@ -51,7 +54,6 @@ public class GameController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  // TODO: update to support public/private games
   @RequestMapping(value = "{id}/join", method = RequestMethod.POST)
   @ResponseBody
   public ResponseEntity<String> joinGame(@PathVariable("id") Long id, @RequestParam String userId) {
