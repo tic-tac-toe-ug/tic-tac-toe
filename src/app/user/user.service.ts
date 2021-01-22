@@ -28,6 +28,19 @@ export class UserService {
     return this.withAuthorization<FullUser>(this.usersUrl + "/" + username);
   }
 
+  update(id: number, userForm: UserForm) {
+    if (this.security.user == undefined) {
+      return new Observable<FullUser>()
+    } else {
+      let header = new HttpHeaders()
+        .set("authorization", "Basic " + this.security.user.auth);
+      return this.http.put<FullUser>(
+        this.usersUrl + '/' + id,
+        userForm,
+        {'headers': header})
+    }
+  }
+
 
   private withAuthorization<T>(url: string) {
     if (this.security.user == undefined) {
@@ -38,6 +51,8 @@ export class UserService {
       return this.http.get<T>(url, {'headers': header})
     }
   }
+
+
 }
 
 
