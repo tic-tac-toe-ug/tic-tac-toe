@@ -32,6 +32,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     //TODO: enable csrf protection, do we need to?
     http.csrf().disable()
       .authorizeRequests()
+      .antMatchers("**/admin")
+      .access("hasRole('ROLE_ADMIN')")
       .antMatchers("/", "/*.js*", "/login", "/users")
       .permitAll()
       .anyRequest()

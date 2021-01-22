@@ -1,6 +1,7 @@
 package com.ug.grupa2.tictactoe.entities;
 
 
+import com.ug.grupa2.tictactoe.enums.Role;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -33,10 +34,13 @@ public class User implements UserDetails {
 
   private Long rank;
 
+  @Enumerated(EnumType.STRING)
+  private Role role;
+
   //TODO: Load from database.
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+    return Collections.singletonList(new SimpleGrantedAuthority(role.getName()));
   }
 
   @Override

@@ -6,6 +6,7 @@ import com.ug.grupa2.tictactoe.controllers.dto.RegistrationFrom;
 import com.ug.grupa2.tictactoe.controllers.dto.UserDetails;
 import com.ug.grupa2.tictactoe.entities.User;
 import com.ug.grupa2.tictactoe.enums.MoveResult;
+import com.ug.grupa2.tictactoe.enums.Role;
 import com.ug.grupa2.tictactoe.utils.exceptions.UserAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Service
@@ -74,6 +76,18 @@ public class UserService implements UserDetailsService {
     }
   }
 
+  public List<User> getUsers() {
+    return userRepository.findAll();
+  }
+
+  public void deleteUser(Long id) {
+    userRepository.deleteById(id);
+  }
+
+  public void resetRanking() {
+    userRepository.findAll().forEach(setScoreAndRankToInitialValue());
+  }
+
   private void updateUsersScore(String user1, Long points) {
     userRepository.findByUsername(user1).ifPresent(u -> u.setScore(u.getScore() + points));
   }
@@ -91,6 +105,7 @@ public class UserService implements UserDetailsService {
       .password(registrationFrom.getPassword())
       .score(INITIAL_SCORE)
       .rank(++numberOfUsers)
+      .role(Role.USER)
       .build();
 
     return userRepository.save(build);
@@ -110,6 +125,14 @@ public class UserService implements UserDetailsService {
       UserDetails details = UserDetails.of(user);
 
       return details.updateRank(details, (long) newRankPosition);
+    };
+  }
+
+  private Consumer<User> setScoreAndRankToInitialValue() {
+    return u -> {
+      u.setRank(0L);
+      u.setScore(0L);
+      userRepository.save(u);
     };
   }
 }

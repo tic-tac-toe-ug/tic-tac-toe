@@ -71,4 +71,11 @@ public class GameController {
     MoveResult result = this.gameService.playGame(game, userId, move);
     return result.toResponse();
   }
+
+  @DeleteMapping("{id}/admin")
+  public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+    gameService.deleteGame(id);
+
+    return ResponseEntity.noContent().build();
+  }
 }
