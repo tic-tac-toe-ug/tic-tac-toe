@@ -1,9 +1,11 @@
+<button *ngIf="securityService.isAdmin()" (click)="resetRanking()" class="btn btn-danger">Zresetuj ranking</button>
 <table class="table">
   <thead>
   <tr>
     <th scope="col">#</th>
     <th scope="col">Login</th>
     <th scope="col">Wynik</th>
+    <th scope="col" *ngIf="securityService.isAdmin()">Usuń</th>
   </tr>
   </thead>
   <tbody>
@@ -11,6 +13,9 @@
     <th scope="row">{{entry.rank}}</th>
     <td><a [routerLink]="['/user', entry.login]">{{entry.login}}</a></td>
     <td>{{entry.score}}</td>
+    <td *ngIf="securityService.isAdmin()">
+      <button (click)="deleteUser(entry.login)" class="btn btn-danger">Usuń</button>
+    </td>
   </tr>
   </tbody>
 </table>

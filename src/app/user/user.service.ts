@@ -24,6 +24,16 @@ export class UserService {
     return this.withAuthorization<Ranking>(this.usersUrl + "/ranking");
   }
 
+  public resetRanking() {
+    if (this.security.user == undefined) {
+      return new Observable<Ranking>()
+    } else {
+      let header = new HttpHeaders()
+        .set("authorization", "Basic " + this.security.user.auth);
+      return this.http.post<Ranking>(this.usersUrl + "/ranking/reset", null, {'headers': header});
+    }
+  }
+
   public getUserByUsername(username: String) {
     return this.withAuthorization<FullUser>(this.usersUrl + "/" + username);
   }
@@ -53,6 +63,15 @@ export class UserService {
   }
 
 
+  deleteUser(login: String) {
+    if (!this.security.isAdmin()) {
+      return new Observable<any>()
+    } else {
+      let header = new HttpHeaders()
+        .set("authorization", "Basic " + this.security.user?.auth);
+      return this.http.delete<any>(this.usersUrl + "/" + login, {'headers': header})
+    }
+  }
 }
 
 

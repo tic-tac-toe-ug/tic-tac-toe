@@ -13,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -52,8 +54,21 @@ public class UserController {
     return ResponseEntity.of(userService.loadUserByUsernameWithoutPassword(username));
   }
 
+  @DeleteMapping("/{username}")
+  public ResponseEntity<Map<String, String>> deleteByUserName(@PathVariable String username) {
+    userService.deleteByUsername(username);
+    Map<String, String> result = new HashMap<>();
+    result.put("result", "OK");
+    return ResponseEntity.ok(result);
+  }
+
   @GetMapping("/ranking")
   public ResponseEntity<Ranking> getUsersRanking() {
     return ResponseEntity.ok(userService.getUsersRanking());
+  }
+
+  @PostMapping("/ranking/reset")
+  public ResponseEntity<Ranking> resetUserRanking() {
+    return ResponseEntity.ok(userService.resetRanking());
   }
 }

@@ -18,6 +18,7 @@ import {RankingComponent} from './ranking/ranking.component';
 import {SecurityService} from "./login/security.service";
 import {CookieService} from 'ng2-cookies';
 import {ShowUserComponent} from "./user/show-user.component";
+import {ListGamesComponent} from "./game/list-games.component";
 
 
 @NgModule({
@@ -32,7 +33,8 @@ import {ShowUserComponent} from "./user/show-user.component";
     RegisterFormComponent,
     LoginComponent,
     RankingComponent,
-    ShowUserComponent
+    ShowUserComponent,
+    ListGamesComponent
   ],
   imports: [
     BrowserModule,

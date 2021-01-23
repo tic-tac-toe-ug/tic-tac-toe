@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 @Service
+@Transactional
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Log4j2
 public class UserService implements UserDetailsService {
@@ -53,6 +55,14 @@ public class UserService implements UserDetailsService {
 
     return Ranking.from(usersByScore);
   }
+
+  public Ranking resetRanking() {
+    this.getUsersByScore()
+      .stream().map(user -> user.withScore(0L))
+      .forEach(this.userRepository::save);
+    return this.getUsersRanking();
+  }
+
 
   public Optional<User> loadUserByUsernameWithoutPassword(String username) {
     return userRepository.findByUsername(username)
@@ -150,5 +160,9 @@ public class UserService implements UserDetailsService {
       return registrationFrom.getLogin().equals(user.getUsername())
         && registrationFrom.getEmail().equals(user.getEmail());
     };
+  }
+
+  public void deleteByUsername(String username) {
+    this.userRepository.deleteByUsername(username);
   }
 }

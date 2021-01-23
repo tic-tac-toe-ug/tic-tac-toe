@@ -10,6 +10,7 @@ import {RankingComponent} from "./ranking/ranking.component";
 import {SecurityService} from "./login/security.service";
 import {AlertService} from "./alert-component/alert.service";
 import {ShowUserComponent} from "./user/show-user.component";
+import {ListGamesComponent} from "./game/list-games.component";
 
 @Component({
   selector: 'app-navigation',
@@ -45,6 +46,7 @@ export const NavigationRoutes: Routes = [
   {path: '', component: HomeComponent},
   {path: 'play-game/:id', component: TicTacToeComponent},
   {path: 'join-game', component: JoinGameComponent},
+  {path: 'games', component: ListGamesComponent},
   {path: 'register-form', component: RegisterFormComponent},
   {path: 'ranking', component: RankingComponent},
   {path: 'login-form', component: LoginComponent},

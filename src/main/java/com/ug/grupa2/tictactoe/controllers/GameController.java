@@ -63,9 +63,9 @@ public class GameController {
 
   @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
   @ResponseBody
-  public ResponseEntity<String> deleteGame(@PathVariable("id") Long id) {
+  public ResponseEntity<List<Game>> listGames(@PathVariable long id) {
     this.gameService.deleteGame(id);
-    return new ResponseEntity<>(HttpStatus.OK);
+    return ResponseEntity.ok(this.gameService.getGames());
   }
 
   @RequestMapping(value = "{id}/join", method = RequestMethod.POST)

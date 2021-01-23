@@ -1,0 +1,22 @@
+<table class="table">
+  <thead>
+  <tr>
+    <th scope="col">Numer gry</th>
+    <th scope="col">Użytkownik 1</th>
+    <th scope="col">Użytkownik 2</th>
+    <th scope="col">Status gry</th>
+    <th scope="col">Usuń grę</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let entry of entries">
+    <td>{{entry.id}}</td>
+    <td>{{entry.user1}}</td>
+    <td>{{entry.user2}}</td>
+    <td>{{entry.gameStatus}}</td>
+    <td>
+      <button class="btn btn-danger" (click)="deleteGame(entry.id)">Usuń grę</button>
+    </td>
+  </tr>
+  </tbody>
+</table>
