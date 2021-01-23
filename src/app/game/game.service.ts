@@ -12,17 +12,21 @@ export class GameService {
     this.gamesUrl = 'http://localhost:8080/games';
   }
 
-  public create(userName: string) {
+  public create(userName: string, is_private: boolean, user2: string) {
     const params = new HttpParams()
       .set('user', userName)
-      .set('privateGame', '1')  // TODO: this is temporary, need to add possibility to choose game type in frontend
-    return this.http.put<Game>(this.gamesUrl+"/create", params);
+      .set('privateGame', is_private.toString())
+      .set('user2', user2)
+    return this.http.put(this.gamesUrl+"/create", params, {responseType: 'text'});
   }
 
   public getJoinableGames() {
     const params = new HttpParams()
       .set('status', 'created')
     return this.http.get<Game[]>(this.gamesUrl, {params});
+  }
+  public getMyGames() {
+    return this.http.get<Game[]>(this.gamesUrl);
   }
   public getGame(id: number) {
     return this.http.get<Game>(this.gamesUrl+'/'+id);

@@ -2,20 +2,29 @@
   <div class="card">
     <h4 class="display-8 text-center">Stwórz grę...</h4>
     <div class="card-body">
-      <form [formGroup]="form" (ngSubmit)="onNewGame()">
-        <label for="login">Nazwa gracza</label>
-        <input type="text" formControlName="login" class="form-control"
-               [ngClass]="{ 'is-invalid': submitted && f.login.errors }"/>
+      <div>
+        <label [hidden]="hide_form">Twoja nazwa: {{username}}</label>
+      </div>
+      <div [hidden]="hide_form">
+        <button [disabled]="loading_public" class="btn btn-primary" (click)="onNewPublicGame()" [hidden]="hide_form">
+          <span *ngIf="loading_public" class="spinner-border spinner-border-sm mr-1"></span>
+          Stwórz publiczną grę
+        </button>
+        <form [formGroup]="form" (ngSubmit)="onNewPrivateGame()">
+          <label for="login">Nazwa drugiego gracza</label>
+          <input type="text" formControlName="login" class="form-control"
+                 [ngClass]="{ 'is-invalid': submitted && f.login.errors }"/>
           <div *ngIf="submitted && f.login.errors != null" class="invalid-feedback">
-          <div *ngIf="f.login.errors.required">Nazwa jest wymagana</div>
-        </div>
-        <div class="form-group">
-          <button [disabled]="loading" class="btn btn-primary">
-            <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
-            Stwórz grę
-          </button>
-        </div>
-      </form>
+            <div *ngIf="f.login.errors.required">Nazwa jest wymagana</div>
+          </div>
+          <div class="form-group">
+            <button [disabled]="loading_private" class="btn btn-secondary" >
+              <span *ngIf="loading_private" class="spinner-border spinner-border-sm mr-1"></span>
+              Stwórz prywatną grę
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
     <h4 class="display-8 text-center">Lub dołącz do istniejącej!</h4>
     <ul>
@@ -24,6 +33,13 @@
         <span *ngIf="loading_join" class="spinner-border spinner-border-sm mr-1"></span>
         Graj
       </button></li>
+    </ul>
+    <h4 class="display-8 text-center">Twoje gry</h4>
+    <ul>
+      <li *ngFor="let game of myGames">Gra {{game.id}}: {{game.user1}} vs {{game.user2}}:
+        <button class="btn btn-primary" (click)="openMyGame(game.id)">
+          Otwórz
+        </button></li>
     </ul>
   </div>
 </div>

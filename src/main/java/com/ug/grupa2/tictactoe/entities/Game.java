@@ -49,5 +49,4 @@ public class Game {
     this.gameStatus = GameStatus.CREATED;
     this.privateGame = privateGame;
   }
-
 }

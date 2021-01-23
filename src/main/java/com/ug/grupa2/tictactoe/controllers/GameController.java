@@ -3,9 +3,11 @@ package com.ug.grupa2.tictactoe.controllers;
 import com.ug.grupa2.tictactoe.entities.Game;
 import com.ug.grupa2.tictactoe.enums.MoveResult;
 import com.ug.grupa2.tictactoe.services.GameService;
+import com.ug.grupa2.tictactoe.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,17 +17,19 @@ import java.util.List;
 @RequestMapping("/games")
 public class GameController {
   private final GameService gameService;
+  private final UserService userService;
 
   @Autowired
-  public GameController(GameService gameService) {
+  public GameController(GameService gameService, UserService userService) {
     this.gameService = gameService;
+    this.userService = userService;
   }
 
   @GetMapping()
   @ResponseBody
   public List<Game> get(@RequestParam(required = false, defaultValue = "") String status) {
     if (!status.equals(""))
-      return this.gameService.getGamesByStatus(status);
+      return this.gameService.getGamesByStatusAndNotPrivate(status);
     else
       return this.gameService.getGames();
   }
@@ -37,14 +41,24 @@ public class GameController {
   }
 
 
-  @PutMapping("/create")
+  @RequestMapping(value = "create", method = RequestMethod.PUT,
+    produces = "text/plain")
   @ResponseBody
-  public ResponseEntity<Game> createGame(@RequestParam String user, @RequestParam boolean privateGame) {
-    // create new game in database
-    // If game is private, frontend should display URL with proper game ID, and then the invited user
-    // can use this link to play. For now no user validation, anyone with link can join private game.
-    // In the future we can provide some random number/string instead of plain ID so it's harder to spoof.
-    return ResponseEntity.ok(this.gameService.createGame(user, privateGame));
+  public ResponseEntity<String> createGame(@RequestParam String user, @RequestParam boolean privateGame,
+                                           @RequestParam(required = false) String user2) {
+    Game game;
+    if (privateGame) {
+      try {
+        this.userService.loadUserByUsername(user2); // no throw = ok
+        game = this.gameService.createGame(user, privateGame);
+        this.gameService.joinGame(game, user2);
+      } catch (UsernameNotFoundException e) {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      }
+    } else
+      game = this.gameService.createGame(user, privateGame);
+
+    return new ResponseEntity<String>(game.getId().toString(), HttpStatus.OK);
   }
 
   @RequestMapping(value = "{id}", method = RequestMethod.DELETE)
