@@ -60,31 +60,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   }
 
   private AuthenticationSuccessHandler successHandler() {
-    return (httpServletRequest, httpServletResponse, authentication) -> {
+    return (request, response, authentication) -> {
       // password should not be sent
-      httpServletResponse.getWriter().write(mapper.writeValueAsString(authentication));
-      httpServletResponse.setContentType("application/json");
-      httpServletResponse.setStatus(200);
+      response.getWriter().write(mapper.writeValueAsString(authentication));
+      response.setContentType("application/json");
+      response.setStatus(200);
     };
   }
 
   private AuthenticationFailureHandler failureHandler() {
-    return (httpServletRequest, httpServletResponse, e) -> {
+    return (request, response, e) -> {
       final Map<String, String> errorModel = new HashMap<>();
-      errorModel.put("errors", e.getMessage());
-      httpServletResponse.getWriter().write(mapper.writeValueAsString(errorModel));
-      httpServletResponse.setStatus(400);
-      httpServletResponse.setContentType("application/json");
+      response.setContentType("application/json; charset=utf-8");
+      errorModel.put("errors", "Podano błędne dane logowania");
+      response.getWriter().write(mapper.writeValueAsString(errorModel));
+      response.setStatus(400);
     };
   }
 
   private LogoutSuccessHandler logoutHandler() {
-    return (httpServletRequest, httpServletResponse, authentication) -> {
+    return (request, response, authentication) -> {
       final Map<String, Boolean> logoutModel = new HashMap<>();
       logoutModel.put("logout", true);
-      httpServletResponse.getWriter().write(mapper.writeValueAsString(logoutModel));
-      httpServletResponse.setStatus(200);
-      httpServletResponse.setContentType("application/json");
+      response.getWriter().write(mapper.writeValueAsString(logoutModel));
+      response.setStatus(200);
+      response.setContentType("application/json");
     };
   }
 }

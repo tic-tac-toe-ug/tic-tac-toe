@@ -35,7 +35,7 @@ export class LoginComponent implements OnInit {
 
   onSubmit() {
     this.submitted = true;
-
+    this.loading = true;
 
     // stop here if form is invalid
     if (this.form.invalid) {
@@ -50,13 +50,11 @@ export class LoginComponent implements OnInit {
           this.alertService.success("Zalogowano!", {keepAfterRouteChange: true});
           this.router.navigateByUrl("/join-game")
         },
-        (err) => {
-          this.alertService.error(err.toString())
+        (errorResponse) => {
+          this.alertService.error(errorResponse.error.errors)
+          this.loading = false;
+          this.submitted = false;
         })
-    if (this.security.user != undefined) {
-      console.log("ZLAOGOWANO FEST!")
-    }
-    this.loading = true;
   }
 
 }

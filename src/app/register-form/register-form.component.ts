@@ -61,6 +61,7 @@ export class RegisterFormComponent implements OnInit {
         this.router.navigateByUrl("/login-form")
       },
       (errorResponse: any) => {
+        console.log(errorResponse)
         this.alertService.error(errorResponse.toString())
         this.loading = false;
       }

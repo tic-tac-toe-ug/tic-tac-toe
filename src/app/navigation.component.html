@@ -10,7 +10,9 @@
       <ng-container *ngIf="securityService.isLogged()">
         <a class="nav-item nav-link" routerLink="/join-game">Graj w grę</a>
       </ng-container>
-      <a class="nav-item nav-link" routerLink="/ranking">Ranking</a>
+      <ng-container *ngIf="securityService.isLogged()">
+        <a class="nav-item nav-link" routerLink="/ranking">Ranking</a>
+      </ng-container>
       <ng-container *ngIf="!securityService.isLogged()">
         <a class="nav-item nav-link" routerLink="/register-form">Zarejestruj się</a>
       </ng-container>
